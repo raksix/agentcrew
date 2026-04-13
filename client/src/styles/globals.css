@@ -2,73 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+@custom-variant dark (&:is(.dark *));
+
+/* AgentCrew theme - sidebar & layout */
+.bg-sidebar { background-color: oklch(0.17 0 0); }
+.border-sidebar-border { border-color: oklch(0.32 0 0); }
+.text-sidebar-foreground { color: oklch(0.98 0 0); }
+
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.98 0 0);
+  --radius: 0.625rem;
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.55 0.2 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.55 0.2 300);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.22 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0 0);
+  --input: oklch(0.25 0 0);
+  --ring: oklch(0.55 0.2 260);
 }
 
 .dark {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 98%;
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.98 0 0);
 }
 
 * {
-  border-color: hsl(var(--foreground) / 0.2);
+  border-color: var(--border);
 }
 
 body {
-  color: hsl(var(--foreground));
-  background: hsl(var(--background));
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--foreground) / 0.2);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--foreground) / 0.4);
-}
-
-/* HeroUI dark mode overrides */
-.dark {
-  --heroui-background: var(--background);
-  --heroui-foreground: var(--foreground);
-}
-
-/* Status colors */
-.status-idle { color: #22c55e; }
-.status-running { color: #eab308; }
-.status-done { color: #a855f7; }
-.status-error { color: #ef4444; }
-
-/* Message bubbles */
-.message-user {
-  @apply bg-blue-500 text-white rounded-2xl rounded-br-md px-4 py-2 max-w-[80%];
-}
-
-.message-assistant {
-  @apply bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-md px-4 py-2 max-w-[80%];
-}
-
-/* Streaming text animation */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.streaming-cursor::after {
-  content: '▌';
-  animation: blink 1s infinite;
-  color: #3B82F6;
+  color: var(--foreground);
+  background: var(--background);
 }
