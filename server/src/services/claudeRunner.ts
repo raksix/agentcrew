@@ -43,13 +43,18 @@ class ClaudeRunner extends EventEmitter {
     });
 
     // Use --print mode for non-interactive execution
+    // Detect if running as root - bypass permission check for root
+    const env = { ...process.env };
+    if (process.getuid && process.getuid() === 0) {
+      env.CLAUDE_NO_CHECK = '1';
+    }
+
     const claudeProcess = spawn('claude', [
-      '--permission-mode', 'bypassPermissions',
       '--print',
       task
     ], {
       cwd,
-      env: { ...process.env },
+      env,
       shell: true
     });
 
