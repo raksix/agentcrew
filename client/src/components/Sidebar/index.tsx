@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button, Input } from '@heroui/react';
 import { Session } from '@/lib/types';
 import { SessionItem } from './SessionItem';
 
@@ -37,13 +37,12 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
 
       {/* New session button */}
       <div className="p-3">
-        <Button 
-          onPress={onOpen}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
-          size="sm"
+        <button
+          onClick={onOpen}
+          className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
         >
           + New Session
-        </Button>
+        </button>
       </div>
 
       {/* Session list */}
@@ -91,12 +90,18 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onClose}>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
               Cancel
-            </Button>
-            <Button color="primary" onPress={handleCreate}>
+            </button>
+            <button
+              onClick={handleCreate}
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+            >
               Create
-            </Button>
+            </button>
           </ModalFooter>
         </ModalContent>
       </Modal>

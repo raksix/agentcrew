@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, KeyboardEvent } from 'react';
-import { Button, Textarea } from '@heroui/react';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -30,37 +29,32 @@ export function ChatInput({ onSend, onStop, disabled, isRunning }: ChatInputProp
   return (
     <div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-900">
       <div className="flex gap-2">
-        <Textarea
-          className="flex-1"
+        <textarea
+          className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:text-gray-400"
           placeholder={isRunning ? "Claude Code is running..." : "Type your message..."}
           value={input}
-          onValueChange={setInput}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled || isRunning}
-          minRows={1}
-          maxRows={6}
-          classNames={{
-            input: "resize-none",
-          }}
+          rows={1}
+          style={{ minHeight: '44px', maxHeight: '150px' }}
         />
         <div className="flex flex-col gap-2">
           {isRunning ? (
-            <Button
-              color="danger"
-              onPress={onStop}
-              className="px-6"
+            <button
+              onClick={onStop}
+              className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
             >
               ⏹ Stop
-            </Button>
+            </button>
           ) : (
-            <Button
-              color="primary"
-              onPress={handleSend}
-              isDisabled={disabled || !input.trim()}
-              className="px-6"
+            <button
+              onClick={handleSend}
+              disabled={disabled || !input.trim()}
+              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Send
-            </Button>
+            </button>
           )}
         </div>
       </div>
