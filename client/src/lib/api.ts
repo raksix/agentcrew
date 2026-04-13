@@ -1,9 +1,17 @@
-import { Session, CreateSessionRequest, SendMessageRequest, Message } from './types';
+import { Session, Message } from './types';
 
-const API_BASE = window.location.origin + '/api';
+function getApiBase(): string {
+  if (typeof window !== 'undefined') {
+    return window.location.origin + '/api';
+  }
+  return 'http://localhost:4005/api';
+}
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
+  const apiBase = getApiBase();
+  const fullUrl = url.startsWith('http') ? url : apiBase + url;
+  
+  const res = await fetch(fullUrl, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -21,52 +29,36 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 // Sessions API
 export async function getSessions(): Promise<Session[]> {
-  return request<Session[]>(`${API_BASE}/sessions`);
+  return request<Session[]>('/sessions');
 }
 
 export async function getSession(id: string): Promise<Session> {
-  return request<Session>(`${API_BASE}/sessions/${id}`);
+  return request<Session>(`/sessions/${id}`);
 }
 
-export async function createSession(data: CreateSessionRequest): Promise<Session> {
-  return request<Session>(`${API_BASE}/sessions`, {
+export async function createSession(data: { name: string; projectTag?: string }): Promise<Session> {
+  return request<Session>('/sessions', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 }
 
-export async function updateSession(id: string, data: Partial<Session>): Promise<Session> {
-  return request<Session>(`${API_BASE}/sessions/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
+export async function deleteSession(id: string): Promise<void> {
+  await request(`/sessions/${id}`, { method: 'DELETE' });
 }
 
-export async function deleteSession(id: string): Promise<{ success: boolean }> {
-  return request<{ success: boolean }>(`${API_BASE}/sessions/${id}`, {
-    method: 'DELETE',
-  });
-}
-
-export async function sendMessage(sessionId: string, data: SendMessageRequest): Promise<{ message: Message; session: Session }> {
-  return request<{ message: Message; session: Session }>(`${API_BASE}/sessions/${sessionId}/message`, {
+export async function sendMessage(sessionId: string, content: string): Promise<{ message: Message; session: Session }> {
+  return request(`/sessions/${sessionId}/message`, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({ content }),
   });
 }
 
-export async function stopSession(sessionId: string): Promise<{ success: boolean }> {
-  return request<{ success: boolean }>(`${API_BASE}/sessions/${sessionId}/stop`, {
-    method: 'POST',
-  });
+export async function stopSession(sessionId: string): Promise<void> {
+  await request(`/sessions/${sessionId}/stop`, { method: 'POST' });
 }
 
-// SSE for real-time events
 export function createSessionEventSource(sessionId: string): EventSource {
-  return new EventSource(`${API_BASE}/sessions/${sessionId}/events`);
-}
-
-// Health check
-export async function healthCheck(): Promise<{ status: string; time: number }> {
-  return request(`${API_BASE}/health`);
+  const apiBase = getApiBase();
+  return new EventSource(apiBase + `/sessions/${sessionId}/events`);
 }
