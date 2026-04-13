@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+}
+
+.dark {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 98%;
+}
+
+* {
+  border-color: hsl(var(--foreground) / 0.2);
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--foreground) / 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground) / 0.4);
+}
+
+/* HeroUI dark mode overrides */
+.dark {
+  --heroui-background: var(--background);
+  --heroui-foreground: var(--foreground);
+}
+
+/* Status colors */
+.status-idle { color: #22c55e; }
+.status-running { color: #eab308; }
+.status-done { color: #a855f7; }
+.status-error { color: #ef4444; }
+
+/* Message bubbles */
+.message-user {
+  @apply bg-blue-500 text-white rounded-2xl rounded-br-md px-4 py-2 max-w-[80%];
+}
+
+.message-assistant {
+  @apply bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-md px-4 py-2 max-w-[80%];
+}
+
+/* Streaming text animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: '▌';
+  animation: blink 1s infinite;
+  color: #3B82F6;
+}
