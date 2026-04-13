@@ -1,6 +1,6 @@
 import { Session, CreateSessionRequest, SendMessageRequest, Message } from './types';
 
-const API_BASE = 'http://localhost:4005/api';
+const API_BASE = 'https://agentcrew.fermag.com.tr/api';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {

@@ -4,22 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* AgentCrew theme - sidebar & layout */
-.bg-sidebar { background-color: oklch(0.17 0 0); }
-.border-sidebar-border { border-color: oklch(0.32 0 0); }
-.text-sidebar-foreground { color: oklch(0.98 0 0); }
-
+/* AgentCrew Theme - CSS Variables */
 :root {
   --background: oklch(0.15 0 0);
   --foreground: oklch(0.98 0 0);
-  --radius: 0.625rem;
   --card: oklch(0.17 0 0);
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.17 0 0);
   --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.55 0.2 260);
+  --primary: 63% 0.2 260;
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.55 0.2 300);
+  --secondary: 55% 0.2 300;
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.22 0 0);
   --muted-foreground: oklch(0.65 0 0);
@@ -30,18 +25,75 @@
   --border: oklch(0.3 0 0);
   --input: oklch(0.25 0 0);
   --ring: oklch(0.55 0.2 260);
+  --radius: 0.625rem;
 }
 
-.dark {
-  --background: oklch(0.15 0 0);
-  --foreground: oklch(0.98 0 0);
+/* Map Tailwind utilities to CSS variables */
+@layer components {
+  .bg-background { background-color: var(--background); }
+  .bg-foreground { background-color: var(--foreground); }
+  .bg-card { background-color: var(--card); }
+  .bg-primary { background-color: oklch(var(--primary)); }
+  .bg-secondary { background-color: oklch(var(--secondary)); }
+  .bg-muted { background-color: var(--muted); }
+  .bg-accent { background-color: var(--accent); }
+  .bg-destructive { background-color: var(--destructive); }
+  
+  .text-foreground { color: var(--foreground); }
+  .text-card-foreground { color: var(--card-foreground); }
+  .text-primary-foreground { color: var(--primary-foreground); }
+  .text-secondary-foreground { color: var(--secondary-foreground); }
+  .text-muted-foreground { color: var(--muted-foreground); }
+  .text-accent-foreground { color: var(--accent-foreground); }
+  .text-destructive-foreground { color: var(--destructive-foreground); }
+  
+  .border-border { border-color: var(--border); }
+  .border-input { border-color: var(--input); }
+  
+  /* Sidebar specific */
+  .bg-sidebar { background-color: var(--card); }
+  .border-sidebar-border { border-color: var(--border); }
+  .text-sidebar-foreground { color: var(--foreground); }
 }
 
-* {
-  border-color: var(--border);
+@layer base {
+  * { border-color: var(--border); }
+  
+  body {
+    color: var(--foreground);
+    background: var(--background);
+  }
+  
+  /* Ensure dark mode works properly */
+  .dark {
+    --background: oklch(0.15 0 0);
+    --foreground: oklch(0.98 0 0);
+  }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
