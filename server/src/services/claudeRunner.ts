@@ -49,6 +49,7 @@ class ClaudeRunner extends EventEmitter {
       env.CLAUDE_NO_CHECK = '1';
     }
 
+    const claudeProcess = spawn('claude', [
       '--print',
       task
     ], {
@@ -127,6 +128,7 @@ class ClaudeRunner extends EventEmitter {
         data: err.message,
         timestamp: Date.now()
       });
+      this.removeSessionListeners(sessionId);
     });
   }
 
