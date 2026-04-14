@@ -53,15 +53,25 @@ export default function Home() {
         const data: SessionEvent = JSON.parse(e.data);
         if (data.type === 'output') setStreamingOutput(prev => prev + data.data);
         else if (data.type === 'done' || data.type === 'error') {
-          // Clear streaming output and force update
-          setStreamingOutput('');
-          // Directly fetch and update the active session
-          api.getSession(activeSession!.id).then(updated => {
-            setActiveSession(updated);
-            setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
-            // Process queue after Claude finishes
-            processQueue();
-          }).catch(console.error);
+          // Wait a bit for backend to persist, then fetch and update
+          const finalOutput = data.data;
+          setTimeout(() => {
+            api.getSession(activeSession!.id).then(updated => {
+              // Preserve streaming output for display, then clear
+              if (finalOutput && updated.messages.length > 0) {
+                // Update the last message with final content if needed
+                const lastMsg = updated.messages[updated.messages.length - 1];
+                if (lastMsg.role === 'assistant' && !lastMsg.content) {
+                  lastMsg.content = finalOutput;
+                }
+              }
+              setActiveSession(updated);
+              setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
+              setStreamingOutput('');
+              // Process queue after Claude finishes
+              processQueue();
+            }).catch(console.error);
+          }, 500);
         }
       };
       setEs(eventSource);
