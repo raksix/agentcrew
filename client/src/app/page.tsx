@@ -71,7 +71,7 @@ export default function Home() {
               // Process queue after Claude finishes
               processQueue();
             }).catch(console.error);
-          }, 500);
+          }, 1000);
         }
       };
       setEs(eventSource);
