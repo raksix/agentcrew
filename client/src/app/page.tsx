@@ -38,7 +38,17 @@ export default function Home() {
   }, [activeSession?.id]);
 
   const loadSessions = async () => {
-    try { setSessions(await api.getSessions()); } catch (e) { console.error(e); }
+    try { 
+      const updatedSessions = await api.getSessions();
+      setSessions(updatedSessions);
+      // Also update activeSession if it exists in the updated list
+      if (activeSession) {
+        const updatedActive = updatedSessions.find(s => s.id === activeSession.id);
+        if (updatedActive) {
+          setActiveSession(updatedActive);
+        }
+      }
+    } catch (e) { console.error(e); }
   };
 
   // Process next message from queue
