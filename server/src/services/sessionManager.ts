@@ -101,6 +101,42 @@ export function addMessage(sessionId: string, message: Omit<Message, 'id' | 'tim
   return newMessage;
 }
 
+export function addAssistantMessage(sessionId: string, content: string): Message | null {
+  const sessions = loadSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  
+  if (!session) return null;
+  
+  const newMessage: Message = {
+    id: uuidv4(),
+    role: 'assistant',
+    content,
+    timestamp: Date.now()
+  };
+  
+  session.messages.push(newMessage);
+  session.updatedAt = Date.now();
+  
+  saveSessions(sessions);
+  return newMessage;
+}
+
+export function appendToLastAssistantMessage(sessionId: string, content: string): boolean {
+  const sessions = loadSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  
+  if (!session) return false;
+  
+  const lastAssistant = [...session.messages].reverse().find(m => m.role === 'assistant');
+  if (!lastAssistant) return false;
+  
+  lastAssistant.content += content;
+  session.updatedAt = Date.now();
+  
+  saveSessions(sessions);
+  return true;
+}
+
 export function updateSessionStatus(id: string, status: Session['status'], error?: string): Session | null {
   const sessions = loadSessions();
   const session = sessions.find(s => s.id === id);

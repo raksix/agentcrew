@@ -12,6 +12,7 @@ interface SidebarProps {
   onSelectSession: (session: Session) => void;
   onCreateSession: (name: string, projectTag?: string) => void;
   onDeleteSession: (id: string) => void;
+  onClose?: () => void;
 }
 
 export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSession, onDeleteSession }: SidebarProps) {
@@ -29,14 +30,21 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
   };
 
   return (
-    <div className="w-64 h-full bg-sidebar border-r border-sidebar-border flex flex-col">
-      {/* Header */}
+    <div className="w-full lg:w-64 h-full bg-sidebar border-r border-sidebar-border flex flex-col max-w-[280px]">
+      {/* Header - with close button on mobile */}
       <div className="p-4 border-b border-sidebar-border flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-sidebar-foreground">🤖 AgentCrew</h1>
-          <p className="text-xs text-muted-foreground mt-1">Multi-agent orchestration</p>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-sidebar-foreground">🤖</h1>
+          <div>
+            <h1 className="text-lg font-bold text-sidebar-foreground">AgentCrew</h1>
+          </div>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={onClose} className="lg:hidden p-2 hover:bg-accent rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
       </div>
 
       {/* New session button */}

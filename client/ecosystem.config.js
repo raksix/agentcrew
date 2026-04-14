@@ -1,20 +1,17 @@
 module.exports = {
-  apps: [{
-    name: 'sooliva-hero-client',
-    cwd: '/root/.openclaw/workspace/sooliva-hero/client',
-    script: 'npm',
-    args: 'run start',
-    instances: 1,
-    autorestart: true,
-    max_memory_restart: '500M',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3099
+  apps: [
+    {
+      name: 'agentcrew-client',
+      script: 'npm',
+      args: 'start',
+      cwd: '/root/.openclaw/workspace/agentcrew/client',
+      env: {
+        NODE_ENV: 'production',
+        PORT: '3005'
+      },
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G'
     }
-  }],
-  deploy: {
-    production: {
-      'pre-deploy-local': 'cd /root/.openclaw/workspace/sooliva-hero/client && npm run build'
-    }
-  }
+  ]
 };

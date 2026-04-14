@@ -12,6 +12,7 @@ export default function Home() {
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [streamingOutput, setStreamingOutput] = useState('');
   const [es, setEs] = useState<EventSource | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => { loadSessions(); }, []);
 
@@ -38,6 +39,7 @@ export default function Home() {
       const session = await api.createSession({ name, projectTag });
       setSessions(prev => [...prev, session]);
       setActiveSession(session);
+      setSidebarOpen(false);
     } catch (e) { console.error(e); }
   };
 
@@ -56,11 +58,62 @@ export default function Home() {
     try { await api.stopSession(activeSession.id); setStreamingOutput(prev => prev + '\n[Stopped]'); } catch (e) { console.error(e); }
   };
 
+  const handleSelectSession = (session: Session) => {
+    setActiveSession(session);
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="flex h-screen">
-      <Sidebar sessions={sessions} activeSession={activeSession} onSelectSession={setActiveSession} onCreateSession={handleCreateSession} onDeleteSession={handleDeleteSession} />
-      <div className="flex-1 flex flex-col">
-        <ChatArea session={activeSession} streamingOutput={streamingOutput} onSendMessage={handleSendMessage} onStop={handleStop} />
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar - hidden on mobile by default */}
+      <div className={`
+        fixed lg:relative z-50 h-full transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        lg:translate-x-0
+      `}>
+        <Sidebar 
+          sessions={sessions} 
+          activeSession={activeSession} 
+          onSelectSession={handleSelectSession}
+          onCreateSession={handleCreateSession}
+          onDeleteSession={handleDeleteSession}
+          onClose={() => setSidebarOpen(false)}
+        />
+      </div>
+      
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header with menu button */}
+        <div className="lg:hidden flex items-center p-3 border-b border-border bg-card">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-accent"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" x2="20" y1="12" y2="12"/>
+              <line x1="4" x2="20" y1="6" y2="6"/>
+              <line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+          </button>
+          <div className="ml-3 font-medium">
+            {activeSession ? activeSession.name : 'AgentCrew'}
+          </div>
+        </div>
+        
+        <ChatArea 
+          session={activeSession} 
+          streamingOutput={streamingOutput} 
+          onSendMessage={handleSendMessage} 
+          onStop={handleStop}
+        />
         {activeSession && <SubagentPanel sessionId={activeSession.id} subagents={activeSession.subagents || []} />}
       </div>
     </div>

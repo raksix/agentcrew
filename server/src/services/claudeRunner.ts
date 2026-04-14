@@ -66,10 +66,15 @@ class ClaudeRunner extends EventEmitter {
     sessionManager.setSessionProcess(sessionId, claudeProcess.pid!);
 
     let outputBuffer = '';
+    // Create initial assistant message
+    sessionManager.addAssistantMessage(sessionId, '');
 
     claudeProcess.stdout?.on('data', (data: Buffer) => {
       const text = data.toString();
       outputBuffer += text;
+      
+      // Append to the last assistant message
+      sessionManager.appendToLastAssistantMessage(sessionId, text);
       
       this.sendEvent(sessionId, {
         type: 'output',
