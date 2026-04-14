@@ -58,7 +58,8 @@ export async function stopSession(sessionId: string): Promise<void> {
   await request(`/sessions/${sessionId}/stop`, { method: 'POST' });
 }
 
-export function createSessionEventSource(sessionId: string): EventSource {
+export function createSessionWebSocket(sessionId: string): WebSocket {
   const apiBase = getApiBase();
-  return new EventSource(apiBase + `/sessions/${sessionId}/events`);
+  const wsUrl = apiBase.replace(/^http/, 'ws') + `/sessions/${sessionId}/ws`;
+  return new WebSocket(wsUrl);
 }

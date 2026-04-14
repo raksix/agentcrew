@@ -1,18 +1,69 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
 import * as sessionManager from './services/sessionManager.js';
 import { claudeRunner } from './services/claudeRunner.js';
 import { CreateSessionRequest, SendMessageRequest, SessionEvent } from './types/index.js';
 
 const app = express();
 const server = createServer(app);
+const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(express.json());
 
-// SSE clients
-const sseClients = new Map<string, (event: SessionEvent) => void>();
+// WebSocket clients
+const wsClients = new Map<string, Set<WebSocket>>();
+
+function broadcastToSession(sessionId: string, event: SessionEvent) {
+  const clients = wsClients.get(sessionId);
+  if (clients) {
+    const message = JSON.stringify(event);
+    clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  }
+}
+
+// WebSocket handling
+wss.on('connection', (ws, req) => {
+  const reqUrl = req.url || '/';
+  const url = new URL(reqUrl, 'http://localhost');
+  const pathParts = url.pathname.split('/');
+  // pathParts: ['', 'api', 'sessions', '<sessionId>', 'ws']
+  // Get second-to-last element (session ID, before 'ws')
+  const sessionId = pathParts.length >= 2 ? pathParts[pathParts.length - 2] : null;
+  
+  if (!sessionId) {
+    ws.close();
+    return;
+  }
+
+
+  console.log('WebSocket connected for session:', sessionId);
+
+  if (!wsClients.has(sessionId)) {
+    wsClients.set(sessionId, new Set());
+  }
+  wsClients.get(sessionId)!.add(ws);
+
+  ws.on('close', () => {
+    const clients = wsClients.get(sessionId);
+    if (clients) {
+      clients.delete(ws);
+      if (clients.size === 0) {
+        wsClients.delete(sessionId);
+      }
+    }
+  });
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err);
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -76,12 +127,9 @@ app.post('/api/sessions/:id/message', async (req, res) => {
     return res.status(500).json({ error: 'Failed to add message' });
   }
 
-  // Setup SSE for this session
+  // Setup WebSocket broadcast for this session
   const sendEvent = (event: SessionEvent) => {
-    const client = sseClients.get(req.params.id);
-    if (client) {
-      client(event);
-    }
+    broadcastToSession(req.params.id, event);
   };
 
   claudeRunner.onSessionEvent(req.params.id, sendEvent);
@@ -103,27 +151,6 @@ app.post('/api/sessions/:id/message', async (req, res) => {
 app.post('/api/sessions/:id/stop', (req, res) => {
   claudeRunner.stop(req.params.id);
   res.json({ success: true });
-});
-
-// SSE events stream
-app.get('/api/sessions/:id/events', (req, res) => {
-  const sessionId = req.params.id;
-  
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
-  });
-  res.flushHeaders();
-
-  sseClients.set(sessionId, (event: SessionEvent) => {
-    res.write(`data: ${JSON.stringify(event)}\n\n`);
-  });
-
-  req.on('close', () => {
-    sseClients.delete(sessionId);
-    claudeRunner.removeSessionListeners(sessionId);
-  });
 });
 
 const PORT = 4005;

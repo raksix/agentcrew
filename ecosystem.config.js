@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'agentcrew-backend',
       script: 'npx',
-      args: 'tsx src/index.ts',
+      args: 'tsx dist/index.js',
       cwd: '/root/.openclaw/workspace/agentcrew/server',
       env: {
         NODE_ENV: 'production',

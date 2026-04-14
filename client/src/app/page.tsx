@@ -11,7 +11,7 @@ export default function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [streamingOutput, setStreamingOutput] = useState('');
-  const [es, setEs] = useState<EventSource | null>(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
@@ -44,22 +44,35 @@ export default function Home() {
     } catch (e) { console.error(e); }
   }, [activeSession]);
 
-  // Handle SSE events
+  // Handle WebSocket events
   useEffect(() => {
     if (activeSession) {
-      es?.close();
-      const eventSource = api.createSessionEventSource(activeSession.id);
-      eventSource.onmessage = (e) => {
+      console.log('Creating WebSocket for session:', activeSession.id);
+      ws?.close();
+      const wsConnection = api.createSessionWebSocket(activeSession.id);
+      
+      wsConnection.onopen = () => {
+        console.log('WebSocket connected!');
+      };
+      
+      wsConnection.onerror = (err) => {
+        console.error('WebSocket error:', err);
+      };
+      
+      wsConnection.onmessage = (e) => {
+        console.log('WebSocket message received:', e.data);
         const data: SessionEvent = JSON.parse(e.data);
-        if (data.type === 'output') setStreamingOutput(prev => prev + data.data);
+        if (data.type === 'output') {
+          console.log('Output received:', data.data);
+          setStreamingOutput(prev => prev + data.data);
+        }
         else if (data.type === 'done' || data.type === 'error') {
-          // Wait a bit for backend to persist, then fetch and update
+          console.log('Done/Error received, final data:', data.data);
           const finalOutput = data.data;
           setTimeout(() => {
             api.getSession(activeSession!.id).then(updated => {
-              // Preserve streaming output for display, then clear
+              console.log('Fetched session, messages:', updated.messages.length);
               if (finalOutput && updated.messages.length > 0) {
-                // Update the last message with final content if needed
                 const lastMsg = updated.messages[updated.messages.length - 1];
                 if (lastMsg.role === 'assistant' && !lastMsg.content) {
                   lastMsg.content = finalOutput;
@@ -68,16 +81,19 @@ export default function Home() {
               setActiveSession(updated);
               setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
               setStreamingOutput('');
-              // Process queue after Claude finishes
               processQueue();
             }).catch(console.error);
           }, 1000);
         }
       };
-      setEs(eventSource);
+      
+      setWs(wsConnection);
     }
-    return () => { es?.close(); };
-  }, [activeSession?.id, processQueue]);
+    return () => {
+      console.log('WebSocket cleanup - closing');
+      ws?.close();
+    };
+  }, [activeSession?.id]);
 
   const loadSessions = async () => {
     try { 

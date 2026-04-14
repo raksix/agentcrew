@@ -1,3 +1,55 @@
 2026-04-14T08:39:56: Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
 2026-04-14T08:39:56: Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
 2026-04-14T08:39:56:     at ignore-listed frames
+2026-04-14T10:08:57: Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+2026-04-14T10:08:57: Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+2026-04-14T10:08:57:     at ignore-listed frames
+2026-04-14T14:22:26: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:22:26:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:22:26:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:22:26:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:22:26:  Detected additional lockfiles: 
+2026-04-14T14:22:26:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:22:26: 
+2026-04-14T14:24:06: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:24:06:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:24:06:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:24:06:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:24:06:  Detected additional lockfiles: 
+2026-04-14T14:24:06:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:24:06: 
+2026-04-14T14:24:35: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:24:35:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:24:35:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:24:35:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:24:35:  Detected additional lockfiles: 
+2026-04-14T14:24:35:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:24:35: 
+2026-04-14T14:29:38: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:29:38:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:29:38:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:29:38:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:29:38:  Detected additional lockfiles: 
+2026-04-14T14:29:38:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:29:38: 
+2026-04-14T14:32:23: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:32:23:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:32:23:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:32:23:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:32:23:  Detected additional lockfiles: 
+2026-04-14T14:32:23:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:32:23: 
+2026-04-14T14:38:46: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:38:46:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:38:46:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:38:46:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:38:46:  Detected additional lockfiles: 
+2026-04-14T14:38:46:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:38:46: 
+2026-04-14T14:41:32: ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-14T14:41:32:  We detected multiple lockfiles and selected the directory of /root/.openclaw/workspace/package-lock.json as the root directory.
+2026-04-14T14:41:32:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-14T14:41:32:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-14T14:41:32:  Detected additional lockfiles: 
+2026-04-14T14:41:32:    * /root/.openclaw/workspace/agentcrew/client/package-lock.json
+2026-04-14T14:41:32: 
