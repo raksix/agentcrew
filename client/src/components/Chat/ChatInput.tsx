@@ -8,9 +8,10 @@ interface ChatInputProps {
   onStop: () => void;
   disabled: boolean;
   isRunning: boolean;
+  queuedCount?: number;
 }
 
-export function ChatInput({ onSend, onStop, disabled, isRunning }: ChatInputProps) {
+export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0 }: ChatInputProps) {
   const [input, setInput] = useState('');
 
   const handleSend = () => {
@@ -25,7 +26,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning }: ChatInputProp
       <div className="flex gap-2">
         <textarea
           className="flex-1 px-4 py-3 rounded-xl border border-input bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-          placeholder={isRunning ? "Claude Code is running..." : "Type your message..."}
+          placeholder={isRunning ? "Claude is working... (message will be queued)" : "Type your message..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -34,12 +35,16 @@ export function ChatInput({ onSend, onStop, disabled, isRunning }: ChatInputProp
               handleSend();
             }
           }}
-          disabled={disabled || isRunning}
           rows={1}
         />
         <div className="flex flex-col gap-2">
           {isRunning ? (
-            <Button variant="destructive" onPress={onStop}>⏹ Stop</Button>
+            <>
+              <Button variant="destructive" onPress={onStop}>⏹ Stop</Button>
+              {queuedCount > 0 && (
+                <div className="text-xs text-center text-yellow-500">{queuedCount} queued</div>
+              )}
+            </>
           ) : (
             <Button onPress={handleSend} isDisabled={disabled || !input.trim()}>Send</Button>
           )}

@@ -14,9 +14,11 @@ export default function Home() {
   const [es, setEs] = useState<EventSource | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [messageQueue, setMessageQueue] = useState<string[]>([]);
 
   useEffect(() => { loadSessions(); }, []);
 
+  // Handle SSE events
   useEffect(() => {
     if (activeSession) {
       es?.close();
@@ -24,7 +26,11 @@ export default function Home() {
       eventSource.onmessage = (e) => {
         const data: SessionEvent = JSON.parse(e.data);
         if (data.type === 'output') setStreamingOutput(prev => prev + data.data);
-        else if (data.type === 'done' || data.type === 'error') { loadSessions(); }
+        else if (data.type === 'done' || data.type === 'error') {
+          loadSessions();
+          // Process queue after Claude finishes
+          processQueue();
+        }
       };
       setEs(eventSource);
     }
@@ -33,6 +39,22 @@ export default function Home() {
 
   const loadSessions = async () => {
     try { setSessions(await api.getSessions()); } catch (e) { console.error(e); }
+  };
+
+  // Process next message from queue
+  const processQueue = async () => {
+    if (messageQueue.length === 0 || !activeSession) return;
+    
+    const [nextMessage, ...rest] = messageQueue;
+    setMessageQueue(rest);
+    
+    setStreamingOutput('');
+    try { 
+      const result = await api.sendMessage(activeSession.id, nextMessage);
+      setActiveSession({ ...result.session });
+      setRefreshKey(k => k + 1);
+      setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
+    } catch (e) { console.error(e); }
   };
 
   const handleCreateSession = async (name: string, projectTag?: string) => {
@@ -50,27 +72,38 @@ export default function Home() {
 
   const handleSendMessage = async (content: string) => {
     if (!activeSession) return;
+    
+    // If Claude is running, queue the message
+    if (activeSession.status === 'running') {
+      setMessageQueue(prev => [...prev, content]);
+      return;
+    }
+    
+    // Otherwise send immediately
     setStreamingOutput('');
     try { 
       const result = await api.sendMessage(activeSession.id, content);
       console.log('Message sent, session has messages:', result.session.messages.length);
-      // Update activeSession with the returned session (which has the new message)
       setActiveSession({ ...result.session });
-      // Force re-render
       setRefreshKey(k => k + 1);
-      // Also update in sessions list
       setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
     } catch (e) { console.error(e); }
   };
 
   const handleStop = async () => {
     if (!activeSession) return;
-    try { await api.stopSession(activeSession.id); setStreamingOutput(prev => prev + '\n[Stopped]'); } catch (e) { console.error(e); }
+    try { 
+      await api.stopSession(activeSession.id); 
+      setStreamingOutput(prev => prev + '\n[Stopped]');
+      // Clear queue on stop
+      setMessageQueue([]);
+    } catch (e) { console.error(e); }
   };
 
   const handleSelectSession = (session: Session) => {
     setActiveSession(session);
     setSidebarOpen(false);
+    setMessageQueue([]); // Clear queue when switching sessions
   };
 
   return (
@@ -124,6 +157,7 @@ export default function Home() {
           streamingOutput={streamingOutput} 
           onSendMessage={handleSendMessage} 
           onStop={handleStop}
+          queuedMessages={messageQueue.length}
         />
         {activeSession && <SubagentPanel sessionId={activeSession.id} subagents={activeSession.subagents || []} />}
       </div>

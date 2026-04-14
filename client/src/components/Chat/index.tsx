@@ -9,9 +9,10 @@ interface ChatAreaProps {
   streamingOutput: string;
   onSendMessage: (content: string) => void;
   onStop: () => void;
+  queuedMessages?: number;
 }
 
-export function ChatArea({ session, streamingOutput, onSendMessage, onStop }: ChatAreaProps) {
+export function ChatArea({ session, streamingOutput, onSendMessage, onStop, queuedMessages = 0 }: ChatAreaProps) {
   if (!session) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
@@ -41,20 +42,28 @@ export function ChatArea({ session, streamingOutput, onSendMessage, onStop }: Ch
             {session.status}
           </span>
         </div>
-        {session.status === 'running' && (
-          <div className="animate-pulse text-yellow-500">Claude Code is working...</div>
-        )}
+        <div className="flex items-center gap-3">
+          {queuedMessages > 0 && (
+            <div className="text-sm bg-yellow-500/20 text-yellow-500 px-3 py-1 rounded-full">
+              {queuedMessages} message{queuedMessages > 1 ? 's' : ''} queued
+            </div>
+          )}
+          {session.status === 'running' && (
+            <div className="animate-pulse text-yellow-500">Claude Code is working...</div>
+          )}
+        </div>
       </div>
 
       {/* Messages */}
       <MessageList messages={session.messages || []} streamingOutput={streamingOutput} />
 
-      {/* Input */}
+      {/* Input - always enabled, shows queue count if running */}
       <ChatInput
         onSend={onSendMessage}
         onStop={onStop}
-        disabled={session.status === 'running'}
+        disabled={false}
         isRunning={session.status === 'running'}
+        queuedCount={queuedMessages}
       />
     </div>
   );
