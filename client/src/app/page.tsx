@@ -13,6 +13,7 @@ export default function Home() {
   const [streamingOutput, setStreamingOutput] = useState('');
   const [es, setEs] = useState<EventSource | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => { loadSessions(); }, []);
 
@@ -52,10 +53,13 @@ export default function Home() {
     setStreamingOutput('');
     try { 
       const result = await api.sendMessage(activeSession.id, content);
+      console.log('Message sent, session has messages:', result.session.messages.length);
       // Update activeSession with the returned session (which has the new message)
-      setActiveSession(result.session);
+      setActiveSession({ ...result.session });
+      // Force re-render
+      setRefreshKey(k => k + 1);
       // Also update in sessions list
-      setSessions(prev => prev.map(s => s.id === result.session.id ? result.session : s));
+      setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
     } catch (e) { console.error(e); }
   };
 
@@ -115,6 +119,7 @@ export default function Home() {
         </div>
         
         <ChatArea 
+          key={refreshKey}
           session={activeSession} 
           streamingOutput={streamingOutput} 
           onSendMessage={handleSendMessage} 
