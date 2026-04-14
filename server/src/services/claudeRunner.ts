@@ -49,8 +49,6 @@ class ClaudeRunner extends EventEmitter {
       env.CLAUDE_NO_CHECK = '1';
     }
 
-    console.log('SPAWNING claude with task:', task);
-    const claudeProcess = spawn('claude', [
       '--print',
       task
     ], {
@@ -60,7 +58,6 @@ class ClaudeRunner extends EventEmitter {
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
-    console.log('Claude process PID:', claudeProcess.pid);
 
     this.runningProcesses.set(sessionId, {
       process: claudeProcess,
@@ -100,10 +97,8 @@ class ClaudeRunner extends EventEmitter {
     });
 
     claudeProcess.on('close', (code) => {
-      console.log('Claude process CLOSE event, code:', code);
       this.runningProcesses.delete(sessionId);
       sessionManager.clearSessionProcess(sessionId);
-      this.removeSessionListeners(sessionId);
 
       if (code === 0) {
         sessionManager.updateSessionStatus(sessionId, 'done');
@@ -120,11 +115,12 @@ class ClaudeRunner extends EventEmitter {
           timestamp: Date.now()
         });
       }
+      
+      // Remove listeners AFTER sending done/error events
+      this.removeSessionListeners(sessionId);
     });
 
     claudeProcess.on('error', (err) => {
-      console.log('Claude process ERROR event:', err.message);
-      this.runningProcesses.delete(sessionId);
       sessionManager.updateSessionStatus(sessionId, 'error', err.message);
       this.sendEvent(sessionId, {
         type: 'error',

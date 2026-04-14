@@ -114,6 +114,7 @@ app.get('/api/sessions/:id/events', (req, res) => {
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
+  res.flushHeaders();
 
   sseClients.set(sessionId, (event: SessionEvent) => {
     res.write(`data: ${JSON.stringify(event)}\n\n`);
