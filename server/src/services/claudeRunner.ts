@@ -55,7 +55,8 @@ class ClaudeRunner extends EventEmitter {
     ], {
       cwd,
       env,
-      shell: true
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe']
     });
 
     this.runningProcesses.set(sessionId, {
