@@ -27,9 +27,15 @@ export default function Home() {
         const data: SessionEvent = JSON.parse(e.data);
         if (data.type === 'output') setStreamingOutput(prev => prev + data.data);
         else if (data.type === 'done' || data.type === 'error') {
-          loadSessions();
-          // Process queue after Claude finishes
-          processQueue();
+          // Clear streaming output and force update
+          setStreamingOutput('');
+          // Directly fetch and update the active session
+          api.getSession(activeSession!.id).then(updated => {
+            setActiveSession(updated);
+            setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
+            // Process queue after Claude finishes
+            processQueue();
+          }).catch(console.error);
         }
       };
       setEs(eventSource);
