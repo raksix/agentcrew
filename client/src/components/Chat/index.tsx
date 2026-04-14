@@ -33,7 +33,7 @@ export function ChatArea({ session, streamingOutput, onSendMessage, onStop, queu
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background min-h-0 overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 bg-card border-b border-border flex items-center justify-between">
         <div>
@@ -55,7 +55,7 @@ export function ChatArea({ session, streamingOutput, onSendMessage, onStop, queu
       </div>
 
       {/* Messages */}
-      <MessageList messages={session.messages || []} streamingOutput={streamingOutput} />
+      <MessageList messages={session.messages || []} streamingOutput={streamingOutput} className="min-h-0" />
 
       {/* Input - always enabled, shows queue count if running */}
       <ChatInput

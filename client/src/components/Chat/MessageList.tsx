@@ -6,6 +6,7 @@ import { Message } from '@/lib/types';
 interface MessageListProps {
   messages: Message[];
   streamingOutput?: string;
+  className?: string;
 }
 
 function MessageBubble({ message }: { message: Message }) {
@@ -26,7 +27,7 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 
-export function MessageList({ messages, streamingOutput }: MessageListProps) {
+export function MessageList({ messages, streamingOutput, className = '' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function MessageList({ messages, streamingOutput }: MessageListProps) {
   }, [messages, streamingOutput]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+    <div className={`flex-1 overflow-y-auto p-4 space-y-2 ${className}`}>
       {messages.length === 0 && !streamingOutput && (
         <div className="text-center text-muted-foreground py-12">
           <div className="text-4xl mb-4">🤖</div>
