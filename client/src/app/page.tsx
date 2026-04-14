@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/Chat';
 import { SubagentPanel } from '@/components/Subagent';
@@ -15,8 +15,34 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
+  
+  // Use ref to always have current queue value
+  const messageQueueRef = useRef<string[]>([]);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    messageQueueRef.current = messageQueue;
+  }, [messageQueue]);
 
   useEffect(() => { loadSessions(); }, []);
+
+  // Process next message from queue - defined before useEffect that uses it
+  const processQueue = useCallback(async () => {
+    const queue = messageQueueRef.current;
+    if (queue.length === 0 || !activeSession) return;
+    
+    const [nextMessage, ...rest] = queue;
+    setMessageQueue(rest);
+    messageQueueRef.current = rest;
+    
+    setStreamingOutput('');
+    try { 
+      const result = await api.sendMessage(activeSession.id, nextMessage);
+      setActiveSession({ ...result.session });
+      setRefreshKey(k => k + 1);
+      setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
+    } catch (e) { console.error(e); }
+  }, [activeSession]);
 
   // Handle SSE events
   useEffect(() => {
@@ -41,7 +67,7 @@ export default function Home() {
       setEs(eventSource);
     }
     return () => { es?.close(); };
-  }, [activeSession?.id]);
+  }, [activeSession?.id, processQueue]);
 
   const loadSessions = async () => {
     try { 
@@ -54,22 +80,6 @@ export default function Home() {
           setActiveSession(updatedActive);
         }
       }
-    } catch (e) { console.error(e); }
-  };
-
-  // Process next message from queue
-  const processQueue = async () => {
-    if (messageQueue.length === 0 || !activeSession) return;
-    
-    const [nextMessage, ...rest] = messageQueue;
-    setMessageQueue(rest);
-    
-    setStreamingOutput('');
-    try { 
-      const result = await api.sendMessage(activeSession.id, nextMessage);
-      setActiveSession({ ...result.session });
-      setRefreshKey(k => k + 1);
-      setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
     } catch (e) { console.error(e); }
   };
 
@@ -99,7 +109,6 @@ export default function Home() {
     setStreamingOutput('');
     try { 
       const result = await api.sendMessage(activeSession.id, content);
-      console.log('Message sent, session has messages:', result.session.messages.length);
       setActiveSession({ ...result.session });
       setRefreshKey(k => k + 1);
       setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
