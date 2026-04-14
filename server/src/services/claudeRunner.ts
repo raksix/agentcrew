@@ -38,9 +38,25 @@ class ClaudeRunner extends EventEmitter {
 
     this.sendEvent(sessionId, {
       type: 'status',
-      data: 'Starting Claude Code...',
+      data: 'Claude Code is working...',
       timestamp: Date.now()
     });
+
+    // Build conversation context from message history
+    const session = sessionManager.getSession(sessionId);
+    const messages = session?.messages || [];
+    
+    // Include conversation history in prompt
+    let fullTask = task;
+    if (messages.length > 0) {
+      const history = messages.map(m => {
+        if (m.role === 'user') return `User: ${m.content}`;
+        if (m.role === 'assistant') return `Assistant: ${m.content}`;
+        return '';
+      }).filter(Boolean).join('\n');
+      
+      fullTask = `Previous conversation:\n${history}\n\nCurrent request: ${task}`;
+    }
 
     // Use --print mode for non-interactive execution
     // Detect if running as root - bypass permission check for root
@@ -51,7 +67,7 @@ class ClaudeRunner extends EventEmitter {
 
     const claudeProcess = spawn('claude', [
       '--print',
-      task
+      fullTask
     ], {
       cwd,
       env,
