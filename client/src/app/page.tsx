@@ -50,7 +50,13 @@ export default function Home() {
   const handleSendMessage = async (content: string) => {
     if (!activeSession) return;
     setStreamingOutput('');
-    try { await api.sendMessage(activeSession.id, content); } catch (e) { console.error(e); }
+    try { 
+      const result = await api.sendMessage(activeSession.id, content);
+      // Update activeSession with the returned session (which has the new message)
+      setActiveSession(result.session);
+      // Also update in sessions list
+      setSessions(prev => prev.map(s => s.id === result.session.id ? result.session : s));
+    } catch (e) { console.error(e); }
   };
 
   const handleStop = async () => {
