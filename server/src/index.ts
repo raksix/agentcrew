@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as sessionManager from './services/sessionManager.js';
 import { claudeRunner } from './services/claudeRunner.js';
 import { CreateSessionRequest, SendMessageRequest, SessionEvent } from './types/index.js';
+import mcpRouter from './routes/mcp.js';
 
 // Create uploads directory
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
@@ -134,6 +135,9 @@ wss.on('connection', (ws, req) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: Date.now() });
 });
+
+// MCP server management
+app.use('/api/mcp', mcpRouter);
 
 // Get all sessions
 app.get('/api/sessions', (req, res) => {
