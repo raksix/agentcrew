@@ -2,8 +2,14 @@
 
 import { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button, Input } from '@heroui/react';
-import { Session } from '@/lib/types';
-import { SessionItem } from './SessionItem';
+
+interface Session {
+  id: string;
+  name: string;
+  projectTag?: string;
+  status: string;
+  messages: any[];
+}
 
 interface SidebarProps {
   sessions: Session[];
@@ -111,21 +117,165 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
       </div>
 
       {/* Create session modal */}
-      <Modal isOpen={isOpen} onClose={onModalClose} backdrop="opaque">
-        <ModalContent className="bg-background">
-          <ModalHeader>New Session</ModalHeader>
-          <ModalBody>
-            <div className="space-y-4">
-              <Input label="Name" placeholder="My Session" value={newName} onValueChange={setNewName} />
-              <Input label="Project Tag (optional)" placeholder="e.g., sooliva" value={newProjectTag} onValueChange={setNewProjectTag} />
+      <Modal 
+        isOpen={isOpen} 
+        onClose={onModalClose} 
+        backdrop="blur"
+        classNames={{
+          base: "bg-card border border-border",
+          header: "border-b border-border",
+          footer: "border-t border-border"
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <span className="text-xl text-primary-foreground font-bold">+</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-foreground">New Session</h2>
+                <p className="text-sm text-muted-foreground font-normal">Create a new Claude Code session</p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalBody className="py-6">
+            <div className="space-y-6">
+              <Input
+                label="Session Name"
+                placeholder="My Agent Session"
+                value={newName}
+                onValueChange={setNewName}
+                variant="bordered"
+                classNames={{
+                  input: "text-base",
+                  label: "text-sm font-medium text-foreground mb-1",
+                  inputWrapper: "border-border bg-muted/50"
+                }}
+                description="Give your session a memorable name"
+              />
+              <Input
+                label="Project Tag (optional)"
+                placeholder="e.g., sooliva, finder, lawfirm"
+                value={newProjectTag}
+                onValueChange={setNewProjectTag}
+                variant="bordered"
+                classNames={{
+                  input: "text-sm",
+                  label: "text-sm font-medium text-foreground mb-1",
+                  inputWrapper: "border-border bg-muted/50"
+                }}
+                description="Group sessions by project"
+              />
+              
+              {/* Quick templates */}
+              <div>
+                <p className="text-sm font-medium text-foreground mb-2">Quick templates</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="flat" 
+                    className="bg-muted"
+                    onPress={() => { setNewName('Coding Task'); setNewProjectTag('general'); }}
+                  >
+                    💻 Coding
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="flat" 
+                    className="bg-muted"
+                    onPress={() => { setNewName('Bug Fix'); setNewProjectTag('debug'); }}
+                  >
+                    🐛 Bug Fix
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="flat" 
+                    className="bg-muted"
+                    onPress={() => { setNewName('Code Review'); setNewProjectTag('review'); }}
+                  >
+                    👀 Review
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="flat" 
+                    className="bg-muted"
+                    onPress={() => { setNewName('New Feature'); setNewProjectTag('feature'); }}
+                  >
+                    🚀 Feature
+                  </Button>
+                </div>
+              </div>
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onModalClose}>Cancel</Button>
-            <Button color="primary" onPress={handleCreate} isDisabled={!newName.trim()}>Create</Button>
+            <Button variant="light" onPress={onModalClose} className="font-medium">
+              Cancel
+            </Button>
+            <Button 
+              color="primary" 
+              onPress={handleCreate} 
+              isDisabled={!newName.trim()}
+              className="font-medium"
+              startContent={
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+              }
+            >
+              Create Session
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+    </div>
+  );
+}
+
+function SessionItem({ session, isActive, onClick, onDelete }: { session: any; isActive: boolean; onClick: () => void; onDelete: () => void }) {
+  const statusColors: Record<string, string> = {
+    idle: 'bg-green-500',
+    running: 'bg-yellow-500',
+    done: 'bg-purple-500',
+    error: 'bg-red-500',
+  };
+
+  const status = statusColors[session.status] || statusColors.idle;
+
+  return (
+    <div
+      className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border ${
+        isActive 
+          ? 'bg-primary/10 border-primary/40' 
+          : 'hover:bg-muted border-transparent'
+      }`}
+      onClick={onClick}
+    >
+      <div className={`w-2.5 h-2.5 rounded-full ${status} flex-shrink-0`} />
+      
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+          {session.name}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {session.messages?.length || 0} messages
+        </p>
+      </div>
+
+      <Button
+        isIconOnly
+        size="sm"
+        variant="light"
+        className="opacity-0 group-hover:opacity-100"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+        </svg>
+      </Button>
     </div>
   );
 }
