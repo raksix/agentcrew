@@ -117,114 +117,47 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
       </div>
 
       {/* Create session modal */}
-      <Modal 
-        isOpen={isOpen} 
-        onClose={onModalClose} 
-        backdrop="blur"
-        classNames={{
-          base: "bg-card border border-border",
-          header: "border-b border-border",
-          footer: "border-t border-border"
-        }}
-      >
+      <Modal isOpen={isOpen} onClose={onModalClose}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <span className="text-xl text-primary-foreground font-bold">+</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground">New Session</h2>
-                <p className="text-sm text-muted-foreground font-normal">Create a new Claude Code session</p>
-              </div>
-            </div>
-          </ModalHeader>
-          <ModalBody className="py-6">
-            <div className="space-y-6">
+          <ModalHeader>New Session</ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
               <Input
                 label="Session Name"
                 placeholder="My Agent Session"
                 value={newName}
                 onValueChange={setNewName}
-                variant="bordered"
-                classNames={{
-                  input: "text-base",
-                  label: "text-sm font-medium text-foreground mb-1",
-                  inputWrapper: "border-border bg-muted/50"
-                }}
-                description="Give your session a memorable name"
               />
               <Input
                 label="Project Tag (optional)"
-                placeholder="e.g., sooliva, finder, lawfirm"
+                placeholder="e.g., sooliva, finder"
                 value={newProjectTag}
                 onValueChange={setNewProjectTag}
-                variant="bordered"
-                classNames={{
-                  input: "text-sm",
-                  label: "text-sm font-medium text-foreground mb-1",
-                  inputWrapper: "border-border bg-muted/50"
-                }}
-                description="Group sessions by project"
               />
               
               {/* Quick templates */}
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">Quick templates</p>
+              <div className="pt-2">
+                <p className="text-sm text-muted-foreground mb-2">Quick templates:</p>
                 <div className="flex flex-wrap gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="flat" 
-                    className="bg-muted"
-                    onPress={() => { setNewName('Coding Task'); setNewProjectTag('general'); }}
-                  >
-                    💻 Coding
+                  <Button size="sm" variant="flat" onPress={() => { setNewName('Coding Task'); setNewProjectTag('coding'); }}>
+                    💻
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="flat" 
-                    className="bg-muted"
-                    onPress={() => { setNewName('Bug Fix'); setNewProjectTag('debug'); }}
-                  >
-                    🐛 Bug Fix
+                  <Button size="sm" variant="flat" onPress={() => { setNewName('Bug Fix'); setNewProjectTag('debug'); }}>
+                    🐛
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="flat" 
-                    className="bg-muted"
-                    onPress={() => { setNewName('Code Review'); setNewProjectTag('review'); }}
-                  >
-                    👀 Review
+                  <Button size="sm" variant="flat" onPress={() => { setNewName('Code Review'); setNewProjectTag('review'); }}>
+                    👀
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="flat" 
-                    className="bg-muted"
-                    onPress={() => { setNewName('New Feature'); setNewProjectTag('feature'); }}
-                  >
-                    🚀 Feature
+                  <Button size="sm" variant="flat" onPress={() => { setNewName('New Feature'); setNewProjectTag('feature'); }}>
+                    🚀
                   </Button>
                 </div>
               </div>
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onModalClose} className="font-medium">
-              Cancel
-            </Button>
-            <Button 
-              color="primary" 
-              onPress={handleCreate} 
-              isDisabled={!newName.trim()}
-              className="font-medium"
-              startContent={
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 5v14M5 12h14"/>
-                </svg>
-              }
-            >
-              Create Session
-            </Button>
+            <Button variant="light" onPress={onModalClose}>Cancel</Button>
+            <Button color="primary" onPress={handleCreate} isDisabled={!newName.trim()}>Create</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
