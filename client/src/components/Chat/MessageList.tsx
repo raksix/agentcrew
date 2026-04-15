@@ -74,10 +74,34 @@ function MessageBubble({ message }: { message: Message }) {
               },
               a({ href, children }) {
                 return (
-                  <a href={href} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">
+                  <a href={href} className="text-blue-500 underline hover:text-blue-400" target="_blank" rel="noopener noreferrer">
                     {children}
                   </a>
                 );
+              },
+              table({ children }) {
+                return (
+                  <div className="overflow-x-auto my-3">
+                    <table className="min-w-full border border-muted-foreground/20 rounded-lg overflow-hidden">
+                      {children}
+                    </table>
+                  </div>
+                );
+              },
+              thead({ children }) {
+                return <thead className="bg-muted-foreground/10">{children}</thead>;
+              },
+              tbody({ children }) {
+                return <tbody>{children}</tbody>;
+              },
+              tr({ children }) {
+                return <tr className="border-b border-muted-foreground/10 last:border-0">{children}</tr>;
+              },
+              th({ children }) {
+                return <th className="px-4 py-2 text-left text-sm font-semibold">{children}</th>;
+              },
+              td({ children }) {
+                return <td className="px-4 py-2 text-sm border-l border-muted-foreground/10 first:border-0">{children}</td>;
               },
               blockquote({ children }) {
                 return <blockquote className="border-l-4 border-muted-foreground/30 pl-4 italic my-2">{children}</blockquote>;
