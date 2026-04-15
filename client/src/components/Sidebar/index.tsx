@@ -111,8 +111,8 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
       </div>
 
       {/* Create session modal */}
-      <Modal isOpen={isOpen} onClose={onModalClose}>
-        <ModalContent>
+      <Modal isOpen={isOpen} onClose={onModalClose} backdrop="opaque">
+        <ModalContent className="bg-background">
           <ModalHeader>New Session</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
