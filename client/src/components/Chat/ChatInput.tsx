@@ -48,7 +48,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
           <textarea
             ref={textareaRef}
             className="w-full bg-transparent resize-none focus:outline-none text-foreground placeholder:text-muted-foreground text-sm min-h-[24px] max-h-[150px]"
-            placeholder={isRunning ? "Claude is working... your message will be queued..." : "Type your message... (Shift+Enter for new line)"}
+            placeholder={isRunning ? "Claude is working... your message will be queued..." : "Type your message..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -58,14 +58,14 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
           
           {/* Bottom row with actions */}
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {queuedCount > 0 && (
                 <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
                   {queuedCount} queued
                 </span>
               )}
-              <span className="text-xs text-muted-foreground">
-                ⏎ send • ⇧+⏎ new line
+              <span className="text-xs text-muted-foreground hidden sm:inline">
+                ⏎ send
               </span>
             </div>
             
@@ -73,28 +73,30 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
               {isRunning ? (
                 <Button
                   color="danger"
+                  variant="solid"
                   size="sm"
                   onPress={onStop}
-                  className="font-medium"
+                  isIconOnly
+                  className="w-8 h-8"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="mr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="6" y="6" width="12" height="12" rx="2"/>
                   </svg>
-                  Stop
                 </Button>
               ) : (
                 <Button
                   color="primary"
+                  variant="solid"
                   size="sm"
                   onPress={handleSend}
                   isDisabled={disabled || !input.trim()}
-                  className="font-medium"
+                  isIconOnly
+                  className="w-8 h-8"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m22 2-11 11"/>
                     <path d="M22 2 15 22 11 13 2 9Z"/>
                   </svg>
-                  Send
                 </Button>
               )}
             </div>
