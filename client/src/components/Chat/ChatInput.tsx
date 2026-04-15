@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Textarea } from '@heroui/react';
 
 interface ChatInputProps {
@@ -22,11 +22,11 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
   };
 
   return (
-    <div className="border-t border-border/50 p-4">
+    <div className="border-t border-border p-4 bg-card">
       <div className="flex gap-3 items-end max-w-4xl mx-auto">
         <Textarea
           className="flex-1"
-          placeholder={isRunning ? "Claude is working... (message will be queued)" : "Type your message..."}
+          placeholder={isRunning ? "Claude is working..." : "Type a message..."}
           value={input}
           onValueChange={setInput}
           onKeyDown={(e) => {
@@ -43,23 +43,11 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
         
         <div className="flex flex-col gap-2">
           {isRunning ? (
-            <Button
-              color="danger"
-              variant="solid"
-              onPress={onStop}
-              size="lg"
-              className="font-medium px-6"
-            >
+            <Button color="danger" onPress={onStop} size="lg">
               Stop
             </Button>
           ) : (
-            <Button
-              color="primary"
-              onPress={handleSend}
-              isDisabled={disabled || !input.trim()}
-              size="lg"
-              className="font-medium px-6"
-            >
+            <Button color="primary" onPress={handleSend} isDisabled={disabled || !input.trim()} size="lg">
               Send
             </Button>
           )}
