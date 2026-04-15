@@ -3,9 +3,9 @@
 import { useRef, useEffect } from 'react';
 import { Message } from '@/lib/types';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 
 interface MessageListProps {
   messages: Message[];
@@ -17,15 +17,22 @@ function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
   
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+      {/* Avatar for assistant */}
+      {!isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-2 ml-1">
+          <span className="text-sm">🤖</span>
+        </div>
+      )}
+      
       <div
-        className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 rounded-2xl shadow-sm transition-all duration-200 ${
           isUser
-            ? 'bg-primary text-primary-foreground rounded-br-md'
-            : 'bg-muted text-foreground rounded-bl-md'
+            ? 'bg-primary text-primary-foreground rounded-br-md glow-primary'
+            : 'bg-muted text-foreground rounded-bl-md border border-border'
         }`}
       >
-        <div className="text-sm font-sans">
+        <div className="text-sm font-sans leading-relaxed">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -39,7 +46,7 @@ function MessageBubble({ message }: { message: Message }) {
                       style={oneDark}
                       language={match[1]}
                       PreTag="div"
-                      className="rounded-lg mt-2 mb-2 text-sm"
+                      className="rounded-lg mt-2 mb-2 text-sm !bg-[oklch(0.12_0_0)]"
                       {...props}
                     >
                       {code}
@@ -48,7 +55,7 @@ function MessageBubble({ message }: { message: Message }) {
                 }
                 
                 return (
-                  <code className="bg-muted-foreground/20 px-1 py-0.5 rounded text-sm" {...props}>
+                  <code className="bg-black/20 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                     {children}
                   </code>
                 );
@@ -76,40 +83,44 @@ function MessageBubble({ message }: { message: Message }) {
               },
               a({ href, children }) {
                 return (
-                  <a href={href} className="text-blue-500 underline hover:text-blue-400" target="_blank" rel="noopener noreferrer">
+                  <a href={href} className="text-blue-400 underline hover:text-blue-300 transition-colors" target="_blank" rel="noopener noreferrer">
                     {children}
                   </a>
                 );
               },
+              blockquote({ children }) {
+                return <blockquote className="border-l-4 border-primary/50 pl-4 italic my-2 text-muted-foreground">{children}</blockquote>;
+              },
+              pre({ children }) {
+                return <pre className="bg-[oklch(0.12_0_0)] rounded-lg p-3 overflow-x-auto my-2">{children}</pre>;
+              },
               table({ children }) {
                 return (
-                  <div className="overflow-x-auto my-3">
-                    <table className="min-w-full border border-muted-foreground/20 rounded-lg overflow-hidden">
-                      {children}
-                    </table>
+                  <div className="overflow-x-auto my-3 rounded-lg border border-border">
+                    <table className="min-w-full text-sm">{children}</table>
                   </div>
                 );
               },
               thead({ children }) {
-                return <thead className="bg-muted-foreground/10">{children}</thead>;
+                return <thead className="bg-primary/10">{children}</thead>;
               },
               tbody({ children }) {
                 return <tbody>{children}</tbody>;
               },
               tr({ children }) {
-                return <tr className="border-b border-muted-foreground/10 last:border-0">{children}</tr>;
+                return <tr className="border-b border-border/50 last:border-0">{children}</tr>;
               },
               th({ children }) {
-                return <th className="px-4 py-2 text-left text-sm font-semibold">{children}</th>;
+                return <th className="px-3 py-2 text-left font-semibold">{children}</th>;
               },
               td({ children }) {
-                return <td className="px-4 py-2 text-sm border-l border-muted-foreground/10 first:border-0">{children}</td>;
+                return <td className="px-3 py-2 border-l border-border/50 first:border-0">{children}</td>;
               },
-              blockquote({ children }) {
-                return <blockquote className="border-l-4 border-muted-foreground/30 pl-4 italic my-2">{children}</blockquote>;
+              strong({ children }) {
+                return <strong className="font-semibold">{children}</strong>;
               },
-              pre({ children }) {
-                return <pre className="bg-muted-foreground/10 rounded-lg p-3 overflow-x-auto my-2">{children}</pre>;
+              em({ children }) {
+                return <em className="italic">{children}</em>;
               },
             }}
           >
@@ -117,6 +128,13 @@ function MessageBubble({ message }: { message: Message }) {
           </ReactMarkdown>
         </div>
       </div>
+      
+      {/* Avatar for user */}
+      {isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ml-2 mr-1">
+          <span className="text-sm">👤</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -129,25 +147,34 @@ export function MessageList({ messages, streamingOutput, className = '' }: Messa
   }, [messages, streamingOutput]);
 
   return (
-    <div className={`flex-1 overflow-y-auto p-4 space-y-2 ${className}`}>
+    <div className={`flex-1 overflow-y-auto p-4 sm:p-6 space-y-2 ${className}`}>
       {messages.length === 0 && !streamingOutput && (
-        <div className="text-center text-muted-foreground py-12">
-          <div className="text-4xl mb-4">🤖</div>
-          <p className="text-lg font-medium">Start a conversation</p>
-          <p className="text-sm">Send a message to run Claude Code</p>
+        <div className="flex flex-col items-center justify-center h-full text-center py-16">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6">
+            <span className="text-4xl">🤖</span>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Start a conversation</h2>
+          <p className="text-muted-foreground max-w-sm">
+            Send a message and Claude Code will help you with your tasks
+          </p>
         </div>
       )}
 
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
+      {messages.map((message, index) => (
+        <div key={message.id || index}>
+          <MessageBubble message={message} />
+        </div>
       ))}
 
       {/* Streaming output */}
       {streamingOutput && (
-        <div className="flex justify-start mb-4">
-          <div className="max-w-[80%] bg-muted rounded-2xl rounded-bl-md px-4 py-3">
-            <div className="text-sm font-sans">
-              <pre className="whitespace-pre-wrap">{streamingOutput}<span className="animate-pulse">▌</span></pre>
+        <div className="flex justify-start mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-2 ml-1">
+            <span className="text-sm">🤖</span>
+          </div>
+          <div className="max-w-[85%] sm:max-w-[75%] bg-muted rounded-2xl rounded-bl-md px-4 py-3 border border-border shadow-sm">
+            <div className="text-sm font-sans leading-relaxed">
+              <pre className="whitespace-pre-wrap">{streamingOutput}<span className="animate-pulse inline-block w-2 h-4 bg-primary ml-1">&nbsp;</span></pre>
             </div>
           </div>
         </div>
