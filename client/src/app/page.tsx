@@ -95,17 +95,35 @@ export default function Home() {
     try { await api.deleteSession(id); setSessions(prev => prev.filter(s => s.id !== id)); if (activeSession?.id === id) setActiveSession(null); } catch (e) { console.error(e); }
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, attachments?: File[]) => {
     if (!activeSession) return;
     
+    // Upload files if any
+    let attachmentUrls: string[] = [];
+    if (attachments && attachments.length > 0) {
+      try {
+        const uploaded = await api.uploadFiles(attachments);
+        attachmentUrls = uploaded.map(f => f.url);
+      } catch (e) {
+        console.error('File upload failed:', e);
+        return;
+      }
+    }
+    
+    // Build message with attachments
+    let fullContent = content;
+    if (attachmentUrls.length > 0) {
+      fullContent = content + '\n\n**Attachments:**\n' + attachmentUrls.map(url => `- [${url.split('/').pop()}](${url})`).join('\n');
+    }
+    
     if (activeSession.status === 'running') {
-      setMessageQueue(prev => [...prev, content]);
+      setMessageQueue(prev => [...prev, fullContent]);
       return;
     }
     
     setStreamingOutput('');
     try { 
-      const result = await api.sendMessage(activeSession.id, content);
+      const result = await api.sendMessage(activeSession.id, fullContent);
       setActiveSession({ ...result.session });
       setRefreshKey(k => k + 1);
       setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));

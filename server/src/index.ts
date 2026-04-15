@@ -2,9 +2,43 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 import * as sessionManager from './services/sessionManager.js';
 import { claudeRunner } from './services/claudeRunner.js';
 import { CreateSessionRequest, SendMessageRequest, SessionEvent } from './types/index.js';
+
+// Create uploads directory
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuidv4()}${ext}`);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    // Allow images and PDFs
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images and PDFs are allowed'));
+    }
+  }
+});
 
 const app = express();
 const server = createServer(app);
@@ -12,6 +46,26 @@ const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(express.json());
+
+// Serve uploaded files
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+// File upload endpoint
+app.post('/api/upload', upload.array('files', 5), (req, res) => {
+  try {
+    const files = (req.files as Express.Multer.File[] || []).map(file => ({
+      id: uuidv4(),
+      originalName: file.originalname,
+      filename: file.filename,
+      mimetype: file.mimetype,
+      size: file.size,
+      url: `/uploads/${file.filename}`
+    }));
+    res.json({ files });
+  } catch (error) {
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
 
 // WebSocket clients
 const wsClients = new Map<string, Set<WebSocket>>();

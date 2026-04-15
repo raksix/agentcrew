@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Button } from '@nextui-org/react';
-import { ScaleIcon, ShieldCheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/outline';
+import { ScaleIcon, ShieldCheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 const stats = [
   { key: 'experience', value: '25+', icon: ScaleIcon },

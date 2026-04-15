@@ -63,3 +63,31 @@ export function createSessionWebSocket(sessionId: string): WebSocket {
   const wsUrl = apiBase.replace(/^http/, 'ws') + `/sessions/${sessionId}/ws`;
   return new WebSocket(wsUrl);
 }
+
+// File upload API
+export interface UploadedFile {
+  id: string;
+  originalName: string;
+  filename: string;
+  mimetype: string;
+  size: number;
+  url: string;
+}
+
+export async function uploadFiles(files: File[]): Promise<UploadedFile[]> {
+  const apiBase = getApiBase();
+  const formData = new FormData();
+  files.forEach(file => formData.append('files', file));
+  
+  const res = await fetch(apiBase + '/upload', {
+    method: 'POST',
+    body: formData,
+  });
+  
+  if (!res.ok) {
+    throw new Error('Upload failed');
+  }
+  
+  const data = await res.json();
+  return data.files;
+}

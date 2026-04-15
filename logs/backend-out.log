@@ -183,3 +183,9 @@
 2026-04-15T13:16:30: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
 2026-04-15T13:20:23: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
 2026-04-15T13:30:55: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
+2026-04-15T13:37:25: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
+2026-04-15T13:39:02: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
+2026-04-15T13:40:21: WebSocket connected for session: b0c20531-1e8d-4f4e-b915-89766dc9d3c4
+2026-04-15T13:43:04: Reset session b0c20531-1e8d-4f4e-b915-89766dc9d3c4 from running to idle (backend restarted)
+2026-04-15T13:43:04: AgentCrew Server running on http://localhost:4005
+2026-04-15T13:43:06: WebSocket connected for session: 5339c7d2-236b-4d57-b700-3604e2c3ef96

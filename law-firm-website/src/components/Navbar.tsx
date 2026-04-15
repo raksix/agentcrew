@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
 import { clsx } from 'clsx';
-import { MenuIcon, XIcon, GlobeIcon } from '@heroicons/react/outline';
+import { Bars3Icon, XMarkIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
 const languages = [
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
@@ -67,7 +67,7 @@ export function Navbar() {
             <Dropdown>
               <DropdownTrigger>
                 <Button variant="light" className="flex items-center gap-2">
-                  <GlobeIcon className="w-5 h-5" />
+                  <GlobeAltIcon className="w-5 h-5" />
                   <span>{currentLang.flag} {currentLang.label}</span>
                 </Button>
               </DropdownTrigger>
@@ -90,7 +90,7 @@ export function Navbar() {
               isIconOnly
               onPress={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+              {isMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
             </Button>
           </div>
         </div>
