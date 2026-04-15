@@ -121,13 +121,26 @@ function MessageBubble({ message }: { message: Message }) {
 
 export function MessageList({ messages, streamingOutput, className = '' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isAtBottomRef = useRef(true);
 
+  // Handle scroll - track if user scrolled up
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    // Consider "at bottom" if within 100px
+    isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 100;
+  };
+
+  // Auto-scroll only if at bottom OR streaming (user wants to see live output)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingOutput]);
+    if (isAtBottomRef.current || streamingOutput) {
+      bottomRef.current?.scrollIntoView({ behavior: streamingOutput ? 'smooth' : 'smooth' });
+    }
+  }, [messages.length, streamingOutput]);
 
   return (
-    <div className={`flex-1 overflow-y-auto p-4 ${className}`}>
+    <div ref={containerRef} onScroll={handleScroll} className={`flex-1 overflow-y-auto p-4 ${className}`}>
       {messages.length === 0 && !streamingOutput && (
         <div className="flex flex-col items-center justify-center h-full py-16">
           <p className="text-lg font-medium text-muted-foreground">Start a conversation</p>
