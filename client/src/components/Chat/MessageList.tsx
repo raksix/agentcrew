@@ -16,6 +16,9 @@ interface MessageListProps {
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
   
+  // Format timestamp
+  const timeStr = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 px-4`}>
       <div
@@ -113,6 +116,9 @@ function MessageBubble({ message }: { message: Message }) {
           >
             {message.content || ''}
           </ReactMarkdown>
+        </div>
+        <div className={`text-xs mt-1 ${isUser ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+          {timeStr}
         </div>
       </div>
     </div>
