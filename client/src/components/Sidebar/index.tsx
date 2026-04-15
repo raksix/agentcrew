@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button, Input } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button } from '@heroui/react';
 
 interface Session {
   id: string;
@@ -131,28 +131,26 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
           </ModalHeader>
           <ModalBody className="py-4">
             <div className="space-y-4">
-              <Input
-                label="Session Name"
-                placeholder="My Agent Session"
-                value={newName}
-                onValueChange={setNewName}
-                variant="faded"
-                classNames={{
-                  inputWrapper: "bg-muted",
-                  mainWrapper: "mb-2"
-                }}
-              />
-              <Input
-                label="Project Tag (optional)"
-                placeholder="e.g., sooliva, finder"
-                value={newProjectTag}
-                onValueChange={setNewProjectTag}
-                variant="faded"
-                classNames={{
-                  inputWrapper: "bg-muted",
-                  mainWrapper: "mb-2"
-                }}
-              />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-foreground">Session Name</label>
+                <input
+                  type="text"
+                  placeholder="My Agent Session"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-foreground">Project Tag (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., sooliva, finder"
+                  value={newProjectTag}
+                  onChange={(e) => setNewProjectTag(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
               
               {/* Quick templates */}
               <div className="pt-2">
