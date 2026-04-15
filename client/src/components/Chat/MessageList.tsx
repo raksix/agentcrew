@@ -17,19 +17,12 @@ function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
   
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-      {/* Avatar for assistant */}
-      {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-2 ml-1">
-          <span className="text-sm">🤖</span>
-        </div>
-      )}
-      
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 px-4`}>
       <div
-        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 rounded-2xl shadow-sm transition-all duration-200 ${
+        className={`max-w-[80%] px-5 py-3 rounded-2xl ${
           isUser
-            ? 'bg-primary text-primary-foreground rounded-br-md glow-primary'
-            : 'bg-muted text-foreground rounded-bl-md border border-border'
+            ? 'bg-primary text-primary-foreground rounded-br-sm'
+            : 'bg-muted text-foreground rounded-bl-sm border border-border/50'
         }`}
       >
         <div className="text-sm font-sans leading-relaxed">
@@ -83,13 +76,13 @@ function MessageBubble({ message }: { message: Message }) {
               },
               a({ href, children }) {
                 return (
-                  <a href={href} className="text-blue-400 underline hover:text-blue-300 transition-colors" target="_blank" rel="noopener noreferrer">
+                  <a href={href} className="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer">
                     {children}
                   </a>
                 );
               },
               blockquote({ children }) {
-                return <blockquote className="border-l-4 border-primary/50 pl-4 italic my-2 text-muted-foreground">{children}</blockquote>;
+                return <blockquote className="border-l-4 border-primary/50 pl-4 italic my-2">{children}</blockquote>;
               },
               pre({ children }) {
                 return <pre className="bg-[oklch(0.12_0_0)] rounded-lg p-3 overflow-x-auto my-2">{children}</pre>;
@@ -116,25 +109,12 @@ function MessageBubble({ message }: { message: Message }) {
               td({ children }) {
                 return <td className="px-3 py-2 border-l border-border/50 first:border-0">{children}</td>;
               },
-              strong({ children }) {
-                return <strong className="font-semibold">{children}</strong>;
-              },
-              em({ children }) {
-                return <em className="italic">{children}</em>;
-              },
             }}
           >
             {message.content || ''}
           </ReactMarkdown>
         </div>
       </div>
-      
-      {/* Avatar for user */}
-      {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ml-2 mr-1">
-          <span className="text-sm">👤</span>
-        </div>
-      )}
     </div>
   );
 }
@@ -147,35 +127,23 @@ export function MessageList({ messages, streamingOutput, className = '' }: Messa
   }, [messages, streamingOutput]);
 
   return (
-    <div className={`flex-1 overflow-y-auto p-4 sm:p-6 space-y-2 ${className}`}>
+    <div className={`flex-1 overflow-y-auto p-4 ${className}`}>
       {messages.length === 0 && !streamingOutput && (
-        <div className="flex flex-col items-center justify-center h-full text-center py-16">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6">
-            <span className="text-4xl">🤖</span>
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Start a conversation</h2>
-          <p className="text-muted-foreground max-w-sm">
-            Send a message and Claude Code will help you with your tasks
-          </p>
+        <div className="flex flex-col items-center justify-center h-full py-16">
+          <p className="text-lg font-medium text-muted-foreground">Start a conversation</p>
+          <p className="text-sm text-muted-foreground mt-1">Send a message to run Claude Code</p>
         </div>
       )}
 
       {messages.map((message, index) => (
-        <div key={message.id || index}>
-          <MessageBubble message={message} />
-        </div>
+        <MessageBubble key={message.id || index} message={message} />
       ))}
 
       {/* Streaming output */}
       {streamingOutput && (
-        <div className="flex justify-start mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-2 ml-1">
-            <span className="text-sm">🤖</span>
-          </div>
-          <div className="max-w-[85%] sm:max-w-[75%] bg-muted rounded-2xl rounded-bl-md px-4 py-3 border border-border shadow-sm">
-            <div className="text-sm font-sans leading-relaxed">
-              <pre className="whitespace-pre-wrap">{streamingOutput}<span className="animate-pulse inline-block w-2 h-4 bg-primary ml-1">&nbsp;</span></pre>
-            </div>
+        <div className="flex justify-start mb-4 px-4">
+          <div className="max-w-[80%] bg-muted rounded-2xl rounded-bl-sm px-5 py-3 border border-border/50">
+            <pre className="whitespace-pre-wrap text-sm">{streamingOutput}<span className="animate-pulse">▌</span></pre>
           </div>
         </div>
       )}
