@@ -1,0 +1,214 @@
+import { spawn, ChildProcess } from 'child_process';
+import { EventEmitter } from 'events';
+import { SessionEvent, Session } from '../types/index.js';
+import * as sessionManager from './sessionManager.js';
+
+interface RunningProcess {
+  process: ChildProcess;
+  sessionId: string;
+}
+
+class ClaudeRunner extends EventEmitter {
+  private runningProcesses: Map<string, RunningProcess> = new Map();
+  private eventStreams: Map<string, ((event: SessionEvent) => void)[]> = new Map();
+
+  sendEvent(sessionId: string, event: SessionEvent) {
+    const listeners = this.eventStreams.get(sessionId) || [];
+    listeners.forEach(fn => fn(event));
+  }
+
+  onSessionEvent(sessionId: string, fn: (event: SessionEvent) => void) {
+    if (!this.eventStreams.has(sessionId)) {
+      this.eventStreams.set(sessionId, []);
+    }
+    this.eventStreams.get(sessionId)!.push(fn);
+  }
+
+  removeSessionListeners(sessionId: string) {
+    this.eventStreams.delete(sessionId);
+  }
+
+  async run(sessionId: string, task: string, workdir?: string): Promise<void> {
+    // Stop any existing process for this session
+    this.stop(sessionId);
+
+    sessionManager.updateSessionStatus(sessionId, 'running');
+
+    const cwd = workdir || process.cwd();
+
+    this.sendEvent(sessionId, {
+      type: 'status',
+      data: 'Claude Code is working...',
+      timestamp: Date.now()
+    });
+
+    // Build conversation context from message history
+    const session = sessionManager.getSession(sessionId);
+    const messages = session?.messages || [];
+    
+    // Include conversation history in prompt
+    let fullTask = task;
+    if (messages.length > 0) {
+      const history = messages.map(m => {
+        if (m.role === 'user') return `User: ${m.content}`;
+        if (m.role === 'assistant') return `Assistant: ${m.content}`;
+        return '';
+      }).filter(Boolean).join('\n');
+      
+      fullTask = `Previous conversation:\n${history}\n\nCurrent request: ${task}`;
+    }
+
+    // Use --print mode for non-interactive execution
+    // Detect if running as root - bypass permission check for root
+    const env = { ...process.env };
+    if (process.getuid && process.getuid() === 0) {
+      env.CLAUDE_NO_CHECK = '1';
+    }
+
+    const claudeProcess = spawn('claude', [
+      '--print',
+      '--settings', JSON.stringify({
+        permissions: {
+          allow: ['Read', 'Write', 'Bash', 'Edit', 'Notebook', 'WebFetch', 'Grep', 'Glob', 'LS', 'Shell'],
+          mode: 'bypassPermissions'
+        }
+      }),
+      fullTask
+    ], {
+      cwd,
+      env,
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+
+    this.runningProcesses.set(sessionId, {
+      process: claudeProcess,
+      sessionId
+    });
+
+    sessionManager.setSessionProcess(sessionId, claudeProcess.pid!);
+
+    let outputBuffer = '';
+    // Create initial assistant message
+    sessionManager.addAssistantMessage(sessionId, '');
+
+    // Timeout after 60 seconds of no output
+    let hasOutput = false;
+    let timeoutHandle: NodeJS.Timeout;
+    
+    const resetTimeout = () => {
+      clearTimeout(timeoutHandle);
+      timeoutHandle = setTimeout(() => {
+        if (!hasOutput) {
+          console.log(`Claude timed out for session ${sessionId}`);
+          claudeProcess.kill('SIGTERM');
+          sessionManager.updateSessionStatus(sessionId, 'error', 'Timeout - no output for 60 seconds');
+          this.sendEvent(sessionId, {
+            type: 'error',
+            data: 'Timeout - Claude took too long to respond',
+            timestamp: Date.now()
+          });
+          this.removeSessionListeners(sessionId);
+        }
+      }, 60000);
+    };
+    
+    resetTimeout();
+
+    
+    claudeProcess.stdout?.on('data', (data: Buffer) => {
+      const text = data.toString();
+      hasOutput = true;
+      clearTimeout(timeoutHandle);
+      outputBuffer += text;
+      
+      // Append to the last assistant message
+      sessionManager.appendToLastAssistantMessage(sessionId, text);
+      
+      this.sendEvent(sessionId, {
+        type: 'output',
+        data: text,
+        timestamp: Date.now()
+      });
+      
+      // Reset timeout on new output
+      resetTimeout();
+    });
+
+    claudeProcess.stderr?.on('data', (data: Buffer) => {
+      const text = data.toString();
+      // Only send as error if it's actually an error
+      if (text.trim()) {
+        this.sendEvent(sessionId, {
+          type: 'error',
+          data: text,
+          timestamp: Date.now()
+        });
+      }
+    });
+
+    claudeProcess.on('close', (code) => {
+      this.runningProcesses.delete(sessionId);
+      sessionManager.clearSessionProcess(sessionId);
+      
+      // Check if we received any output - if not and code is 1, might be permission issue
+      if (code !== 0 && !outputBuffer.trim()) {
+        sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code} (no output)`);
+        this.sendEvent(sessionId, {
+          type: 'error',
+          data: `Process exited with code ${code} (no output)`,
+          timestamp: Date.now()
+        });
+      } else if (code === 0) {
+        sessionManager.updateSessionStatus(sessionId, 'done');
+        this.sendEvent(sessionId, {
+          type: 'done',
+          data: outputBuffer,
+          timestamp: Date.now()
+        });
+      } else {
+        sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code}`);
+        this.sendEvent(sessionId, {
+          type: 'error',
+          data: outputBuffer || `Process exited with code ${code}`,
+          timestamp: Date.now()
+        });
+      }
+      
+      // Remove listeners AFTER sending done/error events
+      this.removeSessionListeners(sessionId);
+    });
+
+    claudeProcess.on('error', (err) => {
+      sessionManager.updateSessionStatus(sessionId, 'error', err.message);
+      this.sendEvent(sessionId, {
+        type: 'error',
+        data: err.message,
+        timestamp: Date.now()
+      });
+      this.removeSessionListeners(sessionId);
+    });
+  }
+
+  stop(sessionId: string) {
+    const running = this.runningProcesses.get(sessionId);
+    if (running) {
+      running.process.kill('SIGTERM');
+      this.runningProcesses.delete(sessionId);
+      sessionManager.clearSessionProcess(sessionId);
+      
+      this.sendEvent(sessionId, {
+        type: 'status',
+        data: 'Stopped by user',
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  isRunning(sessionId: string): boolean {
+    return this.runningProcesses.has(sessionId);
+  }
+}
+
+export const claudeRunner = new ClaudeRunner();

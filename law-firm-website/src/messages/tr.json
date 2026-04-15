@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "about": "Hakkımızda",
+    "services": "Hizmetler",
+    "team": "Ekibimiz",
+    "contact": "İletişim"
+  },
+  "hero": {
+    "title": "Hukukta Güvenilir Çözüm Ortağınız",
+    "subtitle": "25 yıllık deneyimimizle, hakkınızı korumak ve hukuki hedeflerinize ulaşmak için yanınızdayız.",
+    "cta": "Ücretsiz Danışmanlık Alın"
+  },
+  "services": {
+    "title": "Hizmetlerimiz",
+    "subtitle": "Geniş yelpazede hukuki danışmanlık ve temsil hizmetleri",
+    "items": {
+      "corporate": {
+        "title": "Kurumsal Hukuk",
+        "description": "Şirket birleşme, satın alma ve kurumsal yönetim danışmanlığı"
+      },
+      "criminal": {
+        "title": "Ceza Hukuku",
+        "description": "Ceza davalarında uzman savunma ve danışmanlık"
+      },
+      "family": {
+        "title": "Aile Hukuku",
+        "description": "Boşanma, velayet ve miras konularında hukuki destek"
+      },
+      "realEstate": {
+        "title": "Gayrimenkul",
+        "description": "Gayrimenkul alım-satım, kiralama ve tapu işlemleri"
+      },
+      "labor": {
+        "title": "İş Hukuku",
+        "description": "İşçi-işveren uyuşmazlıkları ve iş sözleşmeleri"
+      },
+      "intellectual": {
+        "title": "Fikri Mülkiyet",
+        "description": "Patent, marka ve telif hakları koruma"
+      }
+    }
+  },
+  "stats": {
+    "title": "Rakamlarla Başarımız",
+    "experience": "Yıllık Deneyim",
+    "cases": "Başarılı Dava",
+    "clients": "Mutlu Müvekkil",
+    "team": "Uzman Avukat"
+  },
+  "team": {
+    "title": "Ekibimiz",
+    "subtitle": "Deneyimli ve başarılı avukat kadromuz"
+  },
+  "contact": {
+    "title": "Bize Ulaşın",
+    "subtitle": "Sorularınız için bize ulaşın, en kısa sürede dönüş yapalım",
+    "name": "Adınız",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "subject": "Konu",
+    "message": "Mesajınız",
+    "submit": "Gönder",
+    "address": "Adres",
+    "phoneLabel": "Telefon",
+    "emailLabel": "E-posta"
+  },
+  "footer": {
+    "rights": "Tüm hakları saklıdır.",
+    "tagline": "Hukukta güvenilir çözüm ortağınız"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "services": "Leistungen",
+    "team": "Unser Team",
+    "contact": "Kontakt"
+  },
+  "hero": {
+    "title": "Ihre vertrauenswürdige Rechtsberatung",
+    "subtitle": "Professionelle rechtliche Beratung und Vertretung",
+    "cta": "Kontaktieren Sie uns"
+  },
+  "services": {
+    "title": "Unsere Fachgebiete",
+    "subtitle": "Wir bieten umfassende Rechtslösungen",
+    "items": {
+      "corporate": "Gesellschaftsrecht",
+      "corporate_desc": "Unternehmensgründung, Fusionen und Übernahmen, Vertragsrecht",
+      "criminal": "Strafrecht",
+      "criminal_desc": "Professionelle Vertretung in Verteidigung und Strafverfolgung",
+      "family": "Familienrecht",
+      "family_desc": "Scheidung, Sorgerecht, Erbschaft und Unterhalt",
+      "realestate": "Immobilienrecht",
+      "realestate_desc": "Grundbuchangelegenheiten, Miet- und Kaufverträge",
+      "labor": "Arbeitsrecht",
+      "labor_desc": "Arbeitnehmer-Arbeitgeber-Streitigkeiten und Vertragsgestaltung",
+      "intellectual": "Geistiges Eigentum",
+      "intellectual_desc": "Patent-, Marken- und Urheberrechtsschutz"
+    }
+  },
+  "stats": {
+    "years": "Jahre Erfahrung",
+    "cases": "Erfolgreiche Fälle",
+    "clients": "Zufriedene Mandanten"
+  },
+  "cta": {
+    "title": "Möchten Sie eine Rechtsberatung?",
+    "subtitle": "Unser Expertenteam steht Ihnen zur Verfügung",
+    "button": "Termin buchen"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Kontaktieren Sie uns mit Ihren Fragen",
+    "form_title": "Kontaktieren Sie uns",
+    "name_label": "Vollständiger Name",
+    "name_placeholder": "Geben Sie Ihren Namen ein",
+    "email_label": "E-Mail",
+    "email_placeholder": "Geben Sie Ihre E-Mail ein",
+    "phone_label": "Telefon",
+    "phone_placeholder": "Geben Sie Ihre Telefonnummer ein",
+    "message_label": "Nachricht",
+    "message_placeholder": "Schreiben Sie Ihre Nachricht",
+    "submit_button": "Senden",
+    "info_title": "Kontaktinformationen",
+    "phone_title": "Telefon",
+    "email_title": "E-Mail",
+    "address_title": "Adresse",
+    "hours_title": "Arbeitszeiten"
+  }
+}

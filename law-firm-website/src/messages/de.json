@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "services": "Leistungen",
+    "team": "Unser Team",
+    "contact": "Kontakt"
+  },
+  "hero": {
+    "title": "Ihr vertrauenswürdiger Partner im Recht",
+    "subtitle": "Mit 25 Jahren Erfahrung sind wir an Ihrer Seite, um Ihre Rechte zu schützen und Ihre rechtlichen Ziele zu erreichen.",
+    "cta": "Kostenlose Beratung erhalten"
+  },
+  "services": {
+    "title": "Unsere Leistungen",
+    "subtitle": "Breites Spektrum an rechtlicher Beratung und Vertretung",
+    "items": {
+      "corporate": {
+        "title": "Unternehmensrecht",
+        "description": "Unternehmensfusion, -übernahme und Corporate-Governance-Beratung"
+      },
+      "criminal": {
+        "title": "Strafrecht",
+        "description": "Expertenverteidigung und Beratung in Strafsachen"
+      },
+      "family": {
+        "title": "Familienrecht",
+        "description": "Rechtliche Unterstützung bei Scheidung, Sorgerecht und Erbschaft"
+      },
+      "realEstate": {
+        "title": "Immobilienrecht",
+        "description": "Immobilienkauf/-verkauf, Miete und Grundbuchgeschäfte"
+      },
+      "labor": {
+        "title": "Arbeitsrecht",
+        "description": "Arbeitnehmer-Arbeitgeber-Streitigkeiten und Arbeitsverträge"
+      },
+      "intellectual": {
+        "title": "Geistiges Eigentum",
+        "description": "Patent-, Marken- und Urheberrechtsschutz"
+      }
+    }
+  },
+  "stats": {
+    "title": "Unser Erfolg in Zahlen",
+    "experience": "Jahre Erfahrung",
+    "cases": "Erfolgreiche Fälle",
+    "clients": "Zufriedene Mandanten",
+    "team": "Expertenanwälte"
+  },
+  "team": {
+    "title": "Unser Team",
+    "subtitle": "Unser erfahrenes und erfolgreiches Anwaltsteam"
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "subtitle": "Reach out to us for your questions, we'll get back to you soon",
+    "name": "Ihr Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "subject": "Betreff",
+    "message": "Ihre Nachricht",
+    "submit": "Senden",
+    "address": "Adresse",
+    "phoneLabel": "Telefon",
+    "emailLabel": "E-Mail"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten.",
+    "tagline": "Ihr vertrauenswürdiger Partner im Recht"
+  }
+}

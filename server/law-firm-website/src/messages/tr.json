@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "about": "Hakkımızda",
+    "services": "Hizmetler",
+    "team": "Ekibimiz",
+    "contact": "İletişim"
+  },
+  "hero": {
+    "title": "Hukukun Güvenilir Adresi",
+    "subtitle": "Profesyonel hukuki danışmanlık ve temsil hizmetleri",
+    "cta": "Bize Ulaşın"
+  },
+  "services": {
+    "title": "Hizmet Alanlarımız",
+    "subtitle": "Geniş yelpazede hukuki çözümler sunuyoruz",
+    "items": {
+      "corporate": "Kurumsal Hukuk",
+      "corporate_desc": "Şirket kuruluşu, birleşme ve devirler, sözleşme hukuku",
+      "criminal": "Ceza Hukuku",
+      "criminal_desc": "Savunma ve kovuşturma süreçlerinde profesyonel temsil",
+      "family": "Aile Hukuku",
+      "family_desc": "Boşanma, velayet, miras ve nafaka davaları",
+      "realestate": "Gayrimenkul Hukuku",
+      "realestate_desc": "Tapu işlemleri, kira ve satış sözleşmeleri",
+      "labor": "İş Hukuku",
+      "labor_desc": "İşçi-işveren uyuşmazlıkları ve sözleşme hazırlama",
+      "intellectual": "Fikri Mülkiyet",
+      "intellectual_desc": "Patent, marka ve telif hakkı koruma"
+    }
+  },
+  "stats": {
+    "years": "Yıllık Deneyim",
+    "cases": "Başarılı Dava",
+    "clients": "Mutlu Müvekkil"
+  },
+  "cta": {
+    "title": "Hukuki Danışmanlık Almak İster misiniz?",
+    "subtitle": "Uzman ekibimiz size yardımcı olmak için hazır",
+    "button": "Randevu Alın"
+  },
+  "footer": {
+    "rights": "Tüm hakları saklıdır."
+  },
+  "contact": {
+    "title": "İletişim",
+    "subtitle": "Sorularınız için bize ulaşın",
+    "form_title": "Bize Ulaşın",
+    "name_label": "Ad Soyad",
+    "name_placeholder": "Adınızı girin",
+    "email_label": "E-posta",
+    "email_placeholder": "E-posta adresinizi girin",
+    "phone_label": "Telefon",
+    "phone_placeholder": "Telefon numaranızı girin",
+    "message_label": "Mesajınız",
+    "message_placeholder": "Mesajınızı yazın",
+    "submit_button": "Gönder",
+    "info_title": "İletişim Bilgileri",
+    "phone_title": "Telefon",
+    "email_title": "E-posta",
+    "address_title": "Adres",
+    "hours_title": "Çalışma Saatleri"
+  }
+}

@@ -6,6 +6,7 @@ import { ChatArea } from '@/components/Chat';
 import { SubagentPanel } from '@/components/Subagent';
 import { Session, SessionEvent } from '@/lib/types';
 import * as api from '@/lib/api';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 export default function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -44,56 +45,37 @@ export default function Home() {
     } catch (e) { console.error(e); }
   }, [activeSession]);
 
-  // Handle WebSocket events
+  // Use the WebSocket hook for real-time streaming
+  const { isConnected, lastMessage } = useWebSocket(activeSession?.id || null);
+  
+  // Handle WebSocket messages
   useEffect(() => {
-    if (activeSession) {
-      console.log('Creating WebSocket for session:', activeSession.id);
-      ws?.close();
-      const wsConnection = api.createSessionWebSocket(activeSession.id);
-      
-      wsConnection.onopen = () => {
-        console.log('WebSocket connected!');
-      };
-      
-      wsConnection.onerror = (err) => {
-        console.error('WebSocket error:', err);
-      };
-      
-      wsConnection.onmessage = (e) => {
-        console.log('WebSocket message received:', e.data);
-        const data: SessionEvent = JSON.parse(e.data);
-        if (data.type === 'output') {
-          console.log('Output received:', data.data);
-          setStreamingOutput(prev => prev + data.data);
-        }
-        else if (data.type === 'done' || data.type === 'error') {
-          console.log('Done/Error received, final data:', data.data);
-          const finalOutput = data.data;
-          setTimeout(() => {
-            api.getSession(activeSession!.id).then(updated => {
-              console.log('Fetched session, messages:', updated.messages.length);
-              if (finalOutput && updated.messages.length > 0) {
-                const lastMsg = updated.messages[updated.messages.length - 1];
-                if (lastMsg.role === 'assistant' && !lastMsg.content) {
-                  lastMsg.content = finalOutput;
-                }
-              }
-              setActiveSession(updated);
-              setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
-              setStreamingOutput('');
-              processQueue();
-            }).catch(console.error);
-          }, 1000);
-        }
-      };
-      
-      setWs(wsConnection);
+    if (!lastMessage) return;
+    
+    console.log('WS: Message received:', lastMessage.type);
+    if (lastMessage.type === 'output') {
+      setStreamingOutput(prev => prev + lastMessage.data);
     }
-    return () => {
-      console.log('WebSocket cleanup - closing');
-      ws?.close();
-    };
-  }, [activeSession?.id]);
+    else if (lastMessage.type === 'done' || lastMessage.type === 'error') {
+      console.log('WS: Done/Error, final data:', lastMessage.data);
+      const finalOutput = lastMessage.data;
+      setTimeout(() => {
+        api.getSession(activeSession!.id).then(updated => {
+          console.log('Fetched session, messages:', updated.messages.length);
+          if (finalOutput && updated.messages.length > 0) {
+            const lastMsg = updated.messages[updated.messages.length - 1];
+            if (lastMsg.role === 'assistant' && !lastMsg.content) {
+              lastMsg.content = finalOutput;
+            }
+          }
+          setActiveSession(updated);
+          setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
+          setStreamingOutput('');
+          processQueue();
+        }).catch(console.error);
+      }, 1000);
+    }
+  }, [lastMessage, activeSession]);
 
   const loadSessions = async () => {
     try { 

@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "team": "Our Team",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Your Trusted Legal Partner",
+    "subtitle": "Professional legal consulting and representation services",
+    "cta": "Contact Us"
+  },
+  "services": {
+    "title": "Our Practice Areas",
+    "subtitle": "We offer comprehensive legal solutions",
+    "items": {
+      "corporate": "Corporate Law",
+      "corporate_desc": "Company formation, mergers and acquisitions, contract law",
+      "criminal": "Criminal Law",
+      "criminal_desc": "Professional representation in defense and prosecution",
+      "family": "Family Law",
+      "family_desc": "Divorce, custody, inheritance and alimony cases",
+      "realestate": "Real Estate Law",
+      "realestate_desc": "Title transactions, lease and sale agreements",
+      "labor": "Labor Law",
+      "labor_desc": "Employee-employer disputes and contract preparation",
+      "intellectual": "Intellectual Property",
+      "intellectual_desc": "Patent, trademark and copyright protection"
+    }
+  },
+  "stats": {
+    "years": "Years of Experience",
+    "cases": "Successful Cases",
+    "clients": "Happy Clients"
+  },
+  "cta": {
+    "title": "Would You Like Legal Consultation?",
+    "subtitle": "Our expert team is ready to help you",
+    "button": "Book Appointment"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Reach out to us with your questions",
+    "form_title": "Contact Us",
+    "name_label": "Full Name",
+    "name_placeholder": "Enter your name",
+    "email_label": "Email",
+    "email_placeholder": "Enter your email",
+    "phone_label": "Phone",
+    "phone_placeholder": "Enter your phone number",
+    "message_label": "Message",
+    "message_placeholder": "Write your message",
+    "submit_button": "Send",
+    "info_title": "Contact Information",
+    "phone_title": "Phone",
+    "email_title": "Email",
+    "address_title": "Address",
+    "hours_title": "Working Hours"
+  }
+}

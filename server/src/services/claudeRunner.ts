@@ -67,6 +67,12 @@ class ClaudeRunner extends EventEmitter {
 
     const claudeProcess = spawn('claude', [
       '--print',
+      '--settings', JSON.stringify({
+        permissions: {
+          allow: ['Read', 'Write', 'Bash', 'Edit', 'Notebook', 'WebFetch', 'Grep', 'Glob', 'LS', 'Shell'],
+          mode: 'bypassPermissions'
+        }
+      }),
       fullTask
     ], {
       cwd,
@@ -87,6 +93,8 @@ class ClaudeRunner extends EventEmitter {
     // Create initial assistant message
     sessionManager.addAssistantMessage(sessionId, '');
 
+
+    
     claudeProcess.stdout?.on('data', (data: Buffer) => {
       const text = data.toString();
       outputBuffer += text;
@@ -99,6 +107,7 @@ class ClaudeRunner extends EventEmitter {
         data: text,
         timestamp: Date.now()
       });
+      
     });
 
     claudeProcess.stderr?.on('data', (data: Buffer) => {
@@ -116,8 +125,16 @@ class ClaudeRunner extends EventEmitter {
     claudeProcess.on('close', (code) => {
       this.runningProcesses.delete(sessionId);
       sessionManager.clearSessionProcess(sessionId);
-
-      if (code === 0) {
+      
+      // Check if we received any output - if not and code is 1, might be permission issue
+      if (code !== 0 && !outputBuffer.trim()) {
+        sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code} (no output)`);
+        this.sendEvent(sessionId, {
+          type: 'error',
+          data: `Process exited with code ${code} (no output)`,
+          timestamp: Date.now()
+        });
+      } else if (code === 0) {
         sessionManager.updateSessionStatus(sessionId, 'done');
         this.sendEvent(sessionId, {
           type: 'done',
@@ -128,7 +145,7 @@ class ClaudeRunner extends EventEmitter {
         sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code}`);
         this.sendEvent(sessionId, {
           type: 'error',
-          data: `Process exited with code ${code}`,
+          data: outputBuffer || `Process exited with code ${code}`,
           timestamp: Date.now()
         });
       }

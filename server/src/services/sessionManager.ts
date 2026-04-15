@@ -164,14 +164,17 @@ export function setSessionProcess(id: string, processId: number): Session | null
   return session;
 }
 
-export function clearSessionProcess(id: string): Session | null {
+export function clearSessionProcess(id: string, status?: 'idle' | 'done' | 'error'): Session | null {
   const sessions = loadSessions();
   const session = sessions.find(s => s.id === id);
   
   if (!session) return null;
   
   session.processId = undefined;
-  session.status = 'idle';
+  // Only set status if explicitly provided, otherwise leave current status
+  if (status) {
+    session.status = status;
+  }
   session.updatedAt = Date.now();
   
   saveSessions(sessions);

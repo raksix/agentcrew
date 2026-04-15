@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #1a365d;
+  --color-secondary: #c6a052;
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}

@@ -14,7 +14,8 @@ module.exports = {
       max_memory_restart: '500M',
       error_file: '/root/.openclaw/workspace/agentcrew/logs/backend-error.log',
       out_file: '/root/.openclaw/workspace/agentcrew/logs/backend-out.log',
-      time: true
+      time: true,
+      run_as: 'claudeuser'
     },
     {
       name: 'agentcrew-client',

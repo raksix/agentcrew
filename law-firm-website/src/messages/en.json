@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "team": "Our Team",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Your Trusted Partner in Law",
+    "subtitle": "With 25 years of experience, we are by your side to protect your rights and achieve your legal goals.",
+    "cta": "Get Free Consultation"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Wide range of legal consulting and representation services",
+    "items": {
+      "corporate": {
+        "title": "Corporate Law",
+        "description": "Company merger, acquisition and corporate governance consulting"
+      },
+      "criminal": {
+        "title": "Criminal Law",
+        "description": "Expert defense and consulting in criminal cases"
+      },
+      "family": {
+        "title": "Family Law",
+        "description": "Legal support in divorce, custody and inheritance matters"
+      },
+      "realEstate": {
+        "title": "Real Estate",
+        "description": "Property buy-sell, leasing and title transactions"
+      },
+      "labor": {
+        "title": "Labor Law",
+        "description": "Employee-employer disputes and employment contracts"
+      },
+      "intellectual": {
+        "title": "Intellectual Property",
+        "description": "Patent, trademark and copyright protection"
+      }
+    }
+  },
+  "stats": {
+    "title": "Our Success in Numbers",
+    "experience": "Years of Experience",
+    "cases": "Successful Cases",
+    "clients": "Happy Clients",
+    "team": "Expert Lawyers"
+  },
+  "team": {
+    "title": "Our Team",
+    "subtitle": "Our experienced and successful team of lawyers"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Reach out to us for your questions, we'll get back to you soon",
+    "name": "Your Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Your Message",
+    "submit": "Send",
+    "address": "Address",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "tagline": "Your trusted partner in law"
+  }
+}

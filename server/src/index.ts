@@ -50,6 +50,17 @@ wss.on('connection', (ws, req) => {
   }
   wsClients.get(sessionId)!.add(ws);
 
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data.toString());
+      if (msg.type === 'ping') {
+        ws.send(JSON.stringify({ type: 'pong' }));
+      }
+    } catch (err) {
+      // Ignore non-JSON messages
+    }
+  });
+  
   ws.on('close', () => {
     const clients = wsClients.get(sessionId);
     if (clients) {
@@ -154,6 +165,15 @@ app.post('/api/sessions/:id/stop', (req, res) => {
 });
 
 const PORT = 4005;
+
+// On startup, reset any "running" sessions to "idle" (backend was likely restarted)
+const sessions = sessionManager.getAllSessions();
+sessions.forEach(session => {
+  if (session.status === 'running') {
+    sessionManager.updateSessionStatus(session.id, 'idle');
+    console.log(`Reset session ${session.id} from running to idle (backend restarted)`);
+  }
+});
 
 server.listen(PORT, () => {
   console.log(`AgentCrew Server running on http://localhost:${PORT}`);
