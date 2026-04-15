@@ -116,23 +116,34 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
         </p>
       </div>
 
-      {/* Create session modal */}
-      <Modal isOpen={isOpen} onClose={onModalClose}>
-        <ModalContent>
-          <ModalHeader>New Session</ModalHeader>
-          <ModalBody>
+      {/* Create session modal - full solid background */}
+      <Modal 
+        isOpen={isOpen} 
+        onClose={onModalClose}
+        classNames={{
+          base: "bg-card text-foreground border border-border",
+          backdrop: "bg-black/60",
+        }}
+      >
+        <ModalContent className="bg-card">
+          <ModalHeader className="border-b border-border">
+            New Session
+          </ModalHeader>
+          <ModalBody className="py-4">
             <div className="space-y-4">
               <Input
                 label="Session Name"
                 placeholder="My Agent Session"
                 value={newName}
                 onValueChange={setNewName}
+                variant="bordered"
               />
               <Input
                 label="Project Tag (optional)"
                 placeholder="e.g., sooliva, finder"
                 value={newProjectTag}
                 onValueChange={setNewProjectTag}
+                variant="bordered"
               />
               
               {/* Quick templates */}
@@ -155,7 +166,7 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
               </div>
             </div>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="border-t border-border">
             <Button variant="light" onPress={onModalClose}>Cancel</Button>
             <Button color="primary" onPress={handleCreate} isDisabled={!newName.trim()}>Create</Button>
           </ModalFooter>
