@@ -136,14 +136,22 @@ export function Sidebar({ sessions, activeSession, onSelectSession, onCreateSess
                 placeholder="My Agent Session"
                 value={newName}
                 onValueChange={setNewName}
-                variant="bordered"
+                variant="faded"
+                classNames={{
+                  inputWrapper: "bg-muted",
+                  mainWrapper: "mb-2"
+                }}
               />
               <Input
                 label="Project Tag (optional)"
                 placeholder="e.g., sooliva, finder"
                 value={newProjectTag}
                 onValueChange={setNewProjectTag}
-                variant="bordered"
+                variant="faded"
+                classNames={{
+                  inputWrapper: "bg-muted",
+                  mainWrapper: "mb-2"
+                }}
               />
               
               {/* Quick templates */}
