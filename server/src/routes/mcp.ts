@@ -7,7 +7,7 @@ const router = Router();
 const SETTINGS_PATH = path.join(process.env.HOME || '/root', '.claude', 'settings.json');
 
 // Get MCP servers
-router.get('/mcp', (_req, res) => {
+router.get('/', (_req, res) => {
   try {
     if (!fs.existsSync(SETTINGS_PATH)) {
       return res.json({ mcpServers: {} });
@@ -20,7 +20,7 @@ router.get('/mcp', (_req, res) => {
 });
 
 // Add/Update MCP server
-router.post('/mcp', (req, res) => {
+router.post('/', (req, res) => {
   try {
     const { name, config } = req.body;
     if (!name || !config) {
@@ -44,7 +44,7 @@ router.post('/mcp', (req, res) => {
 });
 
 // Delete MCP server
-router.delete('/mcp/:name', (req, res) => {
+router.delete('/:name', (req, res) => {
   try {
     const { name } = req.params;
 
