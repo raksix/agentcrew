@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/Chat';
-import { SubagentPanel } from '@/components/Subagent';
+
 import { Button } from '@heroui/react';
 import { Session, SessionEvent } from '@/lib/types';
 import * as api from '@/lib/api';
@@ -184,9 +184,7 @@ export default function Home() {
           isConnected={isConnected}
         />
         
-        {activeSession && (
-          <SubagentPanel sessionId={activeSession.id} subagents={activeSession.subagents || []} />
-        )}
+
       </div>
     </div>
   );
