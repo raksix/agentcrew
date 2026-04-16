@@ -6,6 +6,7 @@ const nextConfig = {
     // Ignore TypeScript errors during build
     ignoreBuildErrors: true,
   },
+  outputFileTracingRoot: __dirname,
 };
 
 module.exports = nextConfig;
