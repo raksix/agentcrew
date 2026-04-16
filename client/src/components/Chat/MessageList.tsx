@@ -126,7 +126,7 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 
-export function MessageList({ messages, streamingOutput, className = '' }: MessageListProps) {
+export function MessageList({ messages, streamingOutput, showTyping, className = '' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);

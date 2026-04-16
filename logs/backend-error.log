@@ -1,0 +1,31 @@
+2026-04-16T10:41:01: Claude runner error: Error: spawn E2BIG
+2026-04-16T10:41:01:     at ChildProcess.spawn (node:internal/child_process:420:11)
+2026-04-16T10:41:01:     at spawn (node:child_process:787:9)
+2026-04-16T10:41:01:     at ClaudeRunner.run (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:68:27)
+2026-04-16T10:41:01:     at <anonymous> (/root/.openclaw/workspace/agentcrew/server/src/index.ts:209:16)
+2026-04-16T10:41:01:     at Layer.handle [as handle_request] (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/layer.js:95:5)
+2026-04-16T10:41:01:     at next (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/route.js:149:13)
+2026-04-16T10:41:01:     at Route.dispatch (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/route.js:119:3)
+2026-04-16T10:41:01:     at Layer.handle [as handle_request] (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/layer.js:95:5)
+2026-04-16T10:41:01:     at /root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/index.js:284:15
+2026-04-16T10:41:01:     at param (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/index.js:365:14) {
+2026-04-16T10:41:01:   errno: -7,
+2026-04-16T10:41:01:   code: 'E2BIG',
+2026-04-16T10:41:01:   syscall: 'spawn'
+2026-04-16T10:41:01: }
+2026-04-16T10:55:31: Killed
+2026-04-16T11:03:02: Claude runner error: Error: spawn E2BIG
+2026-04-16T11:03:02:     at ChildProcess.spawn (node:internal/child_process:420:11)
+2026-04-16T11:03:02:     at spawn (node:child_process:787:9)
+2026-04-16T11:03:02:     at ClaudeRunner.run (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:68:27)
+2026-04-16T11:03:02:     at <anonymous> (/root/.openclaw/workspace/agentcrew/server/src/index.ts:209:16)
+2026-04-16T11:03:02:     at Layer.handle [as handle_request] (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/layer.js:95:5)
+2026-04-16T11:03:02:     at next (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/route.js:149:13)
+2026-04-16T11:03:02:     at Route.dispatch (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/route.js:119:3)
+2026-04-16T11:03:02:     at Layer.handle [as handle_request] (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/layer.js:95:5)
+2026-04-16T11:03:02:     at /root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/index.js:284:15
+2026-04-16T11:03:02:     at param (/root/.openclaw/workspace/agentcrew/server/node_modules/express/lib/router/index.js:365:14) {
+2026-04-16T11:03:02:   errno: -7,
+2026-04-16T11:03:02:   code: 'E2BIG',
+2026-04-16T11:03:02:   syscall: 'spawn'
+2026-04-16T11:03:02: }

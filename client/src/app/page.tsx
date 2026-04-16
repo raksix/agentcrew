@@ -13,6 +13,8 @@ export default function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [streamingOutput, setStreamingOutput] = useState('');
+  const [thinkingContent, setThinkingContent] = useState('');
+  const [showThinking, setShowThinking] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
@@ -50,8 +52,12 @@ export default function Home() {
     if (lastMessage.type === 'output') {
       setStreamingOutput(prev => prev + lastMessage.data);
     }
+    else if (lastMessage.type === 'thinking') {
+      setThinkingContent(prev => prev + lastMessage.data + '\n');
+    }
     else if (lastMessage.type === 'done' || lastMessage.type === 'error') {
       const finalOutput = lastMessage.data;
+      setThinkingContent('');
       setTimeout(() => {
         api.getSession(activeSession!.id).then(updated => {
           if (finalOutput && updated.messages.length > 0) {
@@ -196,6 +202,9 @@ export default function Home() {
           key={refreshKey}
           session={activeSession} 
           streamingOutput={streamingOutput} 
+          thinkingContent={thinkingContent}
+          showThinking={showThinking}
+          onToggleThinking={() => setShowThinking(!showThinking)}
           onSendMessage={handleSendMessage} 
           onStop={handleStop}
           queuedMessages={messageQueue.length}

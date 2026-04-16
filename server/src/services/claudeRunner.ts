@@ -66,6 +66,7 @@ class ClaudeRunner extends EventEmitter {
     }
 
     const claudeProcess = spawn('claude', [
+      '--verbose',
       '--output-format', 'stream-json',
       '--settings', JSON.stringify({
         permissions: {
@@ -122,8 +123,13 @@ class ClaudeRunner extends EventEmitter {
                 if (block.type === 'text') {
                   displayText += block.text || '';
                 } else if (block.type === 'thinking') {
-                  displayText += `[Thinking: ${block.thinking?.substring(0, 100)}...]
-`;
+                  // Send thinking as separate event for nice UI display
+                  const thinkingPreview = block.thinking?.substring(0, 300) || '';
+                  this.sendEvent(sessionId, {
+                    type: 'thinking',
+                    data: thinkingPreview,
+                    timestamp: Date.now()
+                  });
                 }
               }
             }

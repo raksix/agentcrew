@@ -48,7 +48,7 @@ export interface CreateSubagentRequest {
 }
 
 export interface SessionEvent {
-  type: 'output' | 'error' | 'done' | 'status';
+  type: 'output' | 'error' | 'done' | 'status' | 'thinking';
   data: string;
   timestamp: number;
 }

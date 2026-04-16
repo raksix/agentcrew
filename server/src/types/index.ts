@@ -57,7 +57,8 @@ export type SessionEventType =
   | 'output'
   | 'error'
   | 'done'
-  | 'status';
+  | 'status'
+  | 'thinking';
 
 export interface SessionEvent {
   type: SessionEventType;
