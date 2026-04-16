@@ -199,11 +199,19 @@ function SessionItem({ session, isActive, onClick, onDelete }: { session: any; i
   const statusColors: Record<string, string> = {
     idle: 'bg-green-500',
     running: 'bg-yellow-500',
+    writing: 'bg-blue-500 animate-pulse',
     done: 'bg-purple-500',
     error: 'bg-red-500',
   };
 
   const status = statusColors[session.status] || statusColors.idle;
+  const statusLabels: Record<string, string> = {
+    idle: 'Idle',
+    running: 'Running',
+    writing: 'Writing',
+    done: 'Done',
+    error: 'Error',
+  };
 
   return (
     <div
@@ -221,7 +229,7 @@ function SessionItem({ session, isActive, onClick, onDelete }: { session: any; i
           {session.name}
         </p>
         <p className="text-xs text-muted-foreground">
-          {session.messages?.length || 0} messages
+          {session.status !== 'idle' ? statusLabels[session.status] || session.status : `${session.messages?.length || 0} messages`}
         </p>
       </div>
 

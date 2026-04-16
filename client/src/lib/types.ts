@@ -15,7 +15,7 @@ export interface Subagent {
   output: string;
 }
 
-export type SessionStatus = 'idle' | 'running' | 'done' | 'error';
+export type SessionStatus = 'idle' | 'running' | 'writing' | 'done' | 'error';
 
 export interface Session {
   id: string;

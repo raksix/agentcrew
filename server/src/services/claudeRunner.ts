@@ -99,6 +99,9 @@ class ClaudeRunner extends EventEmitter {
       const text = data.toString();
       outputBuffer += text;
       
+      // Set status to writing when receiving output
+      sessionManager.updateSessionStatus(sessionId, 'writing');
+      
       // Append to the last assistant message
       sessionManager.appendToLastAssistantMessage(sessionId, text);
       
