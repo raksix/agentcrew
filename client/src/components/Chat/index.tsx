@@ -31,11 +31,14 @@ export function ChatArea({ session, streamingOutput, onSendMessage, onStop, queu
   const statusConfig = {
     idle: { color: 'bg-green-500', text: 'Ready' },
     running: { color: 'bg-yellow-500', text: 'Working...' },
+    writing: { color: 'bg-blue-500 animate-pulse', text: 'Writing...' },
     done: { color: 'bg-purple-500', text: 'Done' },
     error: { color: 'bg-red-500', text: 'Error' },
   };
 
   const status = statusConfig[session.status as keyof typeof statusConfig] || statusConfig.idle;
+
+  const showTyping = (session.status === 'running' || session.status === 'writing') && !streamingOutput && session.messages.length > 0;
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-0">
@@ -60,7 +63,7 @@ export function ChatArea({ session, streamingOutput, onSendMessage, onStop, queu
       </div>
 
       {/* Messages */}
-      <MessageList messages={session.messages || []} streamingOutput={streamingOutput} className="min-h-0" />
+      <MessageList messages={session.messages || []} streamingOutput={streamingOutput} showTyping={showTyping} className="min-h-0" />
 
       {/* Input */}
       <ChatInput

@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 interface MessageListProps {
   messages: Message[];
   streamingOutput?: string;
+  showTyping?: boolean;
   className?: string;
 }
 
@@ -166,6 +167,19 @@ export function MessageList({ messages, streamingOutput, className = '' }: Messa
         <div className="flex justify-start mb-4 px-4">
           <div className="max-w-[85%] sm:max-w-[75%] bg-muted rounded-2xl rounded-bl-sm px-5 py-3 border border-border/50 overflow-hidden">
             <pre className="whitespace-pre-wrap break-words text-sm">{streamingOutput}<span className="animate-pulse">▌</span></pre>
+          </div>
+        </div>
+      )}
+
+      {/* Typing indicator */}
+      {showTyping && (
+        <div className="flex justify-start mb-4 px-4">
+          <div className="max-w-[85%] sm:max-w-[75%] bg-muted rounded-2xl rounded-bl-sm px-5 py-3 border border-border/50">
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
           </div>
         </div>
       )}
