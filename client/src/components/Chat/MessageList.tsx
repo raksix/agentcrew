@@ -130,12 +130,24 @@ export function MessageList({ messages, streamingOutput, showTyping, className =
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
+  const hasScrolledUpRef = useRef(false);
+  const VISIBLE_MESSAGE_LIMIT = 50;
 
   // Handle scroll - track if user scrolled up
   const handleScroll = () => {
     if (!containerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 100;
+    const atBottom = scrollHeight - scrollTop - clientHeight < 100;
+    
+    // If user scrolls to bottom, allow full rendering again
+    if (atBottom) {
+      hasScrolledUpRef.current = false;
+    } else if (!isAtBottomRef.current) {
+      // User has scrolled up and is still not at bottom
+      hasScrolledUpRef.current = true;
+    }
+    
+    isAtBottomRef.current = atBottom;
   };
 
   // Auto-scroll only if at bottom OR streaming
@@ -144,6 +156,13 @@ export function MessageList({ messages, streamingOutput, showTyping, className =
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages.length, streamingOutput]);
+
+  // Determine which messages to render
+  const shouldRenderAll = !hasScrolledUpRef.current || messages.length <= VISIBLE_MESSAGE_LIMIT;
+  const renderedMessages = shouldRenderAll 
+    ? messages 
+    : messages.slice(-VISIBLE_MESSAGE_LIMIT);
+  const hasMoreAbove = !shouldRenderAll && messages.length > VISIBLE_MESSAGE_LIMIT;
 
   return (
     <div 
@@ -158,7 +177,20 @@ export function MessageList({ messages, streamingOutput, showTyping, className =
         </div>
       )}
 
-      {messages.map((message, index) => (
+      {/* Show "scroll to bottom" button if there are more messages above */}
+      {hasMoreAbove && (
+        <button
+          onClick={() => {
+            hasScrolledUpRef.current = false;
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="sticky top-2 mx-auto mb-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm shadow-lg hover:bg-primary/90 transition-colors"
+        >
+          ↓ Scroll to bottom ({messages.length - VISIBLE_MESSAGE_LIMIT} more)
+        </button>
+      )}
+
+      {renderedMessages.map((message, index) => (
         <MessageBubble key={message.id || index} message={message} />
       ))}
 
