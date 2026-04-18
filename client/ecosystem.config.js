@@ -7,7 +7,7 @@ module.exports = {
       cwd: '/root/.openclaw/workspace/agentcrew/client',
       env: {
         NODE_ENV: 'production',
-        PORT: '3005'
+        PORT: '3006'
       },
       autorestart: true,
       watch: false,

@@ -2,11 +2,19 @@ import { spawn, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { SessionEvent, Session } from '../types/index.js';
 import * as sessionManager from './sessionManager.js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface RunningProcess {
   process: ChildProcess;
   sessionId: string;
 }
+
+// Base directory for session working directories
+const SESSIONS_BASE_DIR = path.join(process.cwd(), 'sessions');
+
+// Maximum command line argument size (1MB to be safe on Linux)
+const MAX_ARG_SIZE = 1000 * 1024;
 
 class ClaudeRunner extends EventEmitter {
   private runningProcesses: Map<string, RunningProcess> = new Map();
@@ -34,7 +42,18 @@ class ClaudeRunner extends EventEmitter {
 
     sessionManager.updateSessionStatus(sessionId, 'running');
 
-    const cwd = workdir || process.cwd();
+    // Use session-specific working directory for resume support
+    // Claude Code stores conversation history in .claude/ directory
+    let sessionWorkDir = workdir;
+    if (!sessionWorkDir) {
+      sessionWorkDir = path.join(SESSIONS_BASE_DIR, sessionId);
+      // Create session directory if it doesn't exist
+      if (!fs.existsSync(sessionWorkDir)) {
+        fs.mkdirSync(sessionWorkDir, { recursive: true });
+      }
+    }
+
+    const cwd = sessionWorkDir;
 
     this.sendEvent(sessionId, {
       type: 'status',
@@ -42,23 +61,10 @@ class ClaudeRunner extends EventEmitter {
       timestamp: Date.now()
     });
 
-    // Build conversation context from message history
-    const session = sessionManager.getSession(sessionId);
-    const messages = session?.messages || [];
+    // Just send the current task - Claude Code handles conversation context internally via .claude/
+    // This avoids E2BIG errors with long conversation histories
+    const fullTask = task;
 
-    // Include conversation history in prompt
-    let fullTask = task;
-    if (messages.length > 0) {
-      const history = messages.map(m => {
-        if (m.role === 'user') return `User: ${m.content}`;
-        if (m.role === 'assistant') return `Assistant: ${m.content}`;
-        return '';
-      }).filter(Boolean).join('\n');
-
-      fullTask = `Previous conversation:\n${history}\n\nCurrent request: ${task}`;
-    }
-
-    // Use --print mode for non-interactive execution
     // Detect if running as root - bypass permission check for root
     const env = { ...process.env };
     if (process.getuid && process.getuid() === 0) {
@@ -83,7 +89,6 @@ class ClaudeRunner extends EventEmitter {
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
-
     this.runningProcesses.set(sessionId, {
       process: claudeProcess,
       sessionId
@@ -98,94 +103,138 @@ class ClaudeRunner extends EventEmitter {
     // Track ongoing output for subagent display
     let currentSubagent: string | null = null;
     let currentTool: string | null = null;
+    let toolOutputBuffer = '';
+    let toolOutputType: 'text' | 'image' | 'resource' | undefined;
 
     claudeProcess.stdout?.on('data', (data: Buffer) => {
       const text = data.toString();
       outputBuffer += text;
-      
-      // Set status to writing when receiving output
-      sessionManager.updateSessionStatus(sessionId, 'writing');
-      
-      // Parse stream-json format (each line is a JSON object)
-      const lines = text.split('\n').filter(line => line.trim());
+
+      // Parse complete JSON objects from buffer
+      const lines = outputBuffer.split('\n');
+      outputBuffer = lines.pop() || '';
+
       for (const line of lines) {
+        if (!line.trim()) continue;
+
         try {
           const parsed = JSON.parse(line);
-          
-          // Extract displayable content based on message type
-          let displayText = '';
-          
-          if (parsed.type === 'assistant' && parsed.message?.content) {
-            // Parse assistant message content blocks
-            const content = parsed.message.content;
-            if (Array.isArray(content)) {
-              for (const block of content) {
-                if (block.type === 'text') {
-                  displayText += block.text || '';
-                } else if (block.type === 'thinking') {
-                  // Send thinking as separate event for nice UI display
-                  const thinkingPreview = block.thinking?.substring(0, 300) || '';
+
+          // Process based on type
+          switch (parsed.type) {
+            case 'assistant':
+            case 'result':
+              // Send actual text content to frontend (not raw JSON)
+              if (parsed.message?.content) {
+                const content = parsed.message.content.map((c: any) => c.text || '').join('');
+                if (content) {
                   this.sendEvent(sessionId, {
-                    type: 'thinking',
-                    data: thinkingPreview,
+                    type: 'output',
+                    data: content,
                     timestamp: Date.now()
                   });
                 }
+                sessionManager.appendToLastAssistantMessage(sessionId, content);
+              } else if (parsed.result) {
+                // For result type, send the result text
+                this.sendEvent(sessionId, {
+                  type: 'output',
+                  data: parsed.result,
+                  timestamp: Date.now()
+                });
               }
-            }
-          } else if (parsed.type === 'result') {
-            displayText = parsed.result || '';
-          } else if (parsed.type === 'tools' && parsed.tools) {
-            // Tools being used
-            for (const tool of parsed.tools) {
-              if (tool.name) {
-                displayText += `[Using tool: ${tool.name}]
-`;
-                currentTool = tool.name;
+              
+              // Check if this is the final result (subtype: success with end_turn)
+              if (parsed.type === 'result' && parsed.subtype === 'success' && parsed.stop_reason === 'end_turn') {
+                sessionManager.updateSessionStatus(sessionId, 'done');
+                this.sendEvent(sessionId, {
+                  type: 'done',
+                  data: 'completed',
+                  timestamp: Date.now()
+                });
               }
-            }
-          } else if (parsed.type === 'tool-result' && parsed.toolResult) {
-            const result = parsed.toolResult;
-            if (result.name) displayText += `[${result.name}] `;
-            if (result.output) displayText += result.output.substring(0, 200);
-            if (result.output?.length > 200) displayText += '...';
-            displayText += '\n';
-          } else if (parsed.type === 'subagent' && parsed.subagent) {
-            displayText += `[Subagent: ${parsed.subagent.name || 'running'}]
-`;
-            currentSubagent = parsed.subagent.name || 'running';
-          } else if (parsed.type === 'error') {
-            displayText = `[Error: ${parsed.error}]\n`;
-          } else if (parsed.type === 'finish') {
-            continue; // Don't append, finish event handles final state
+              break;
+
+            case 'tools':
+              // Tools being used
+              if (parsed.tools) {
+                currentTool = parsed.tools.map((t: any) => t.name).join(', ');
+                toolOutputBuffer = '';
+              }
+              break;
+
+            case 'tool-result':
+              if (parsed.results) {
+                for (const result of parsed.results) {
+                  if (result.output) {
+                    toolOutputBuffer += result.output;
+                    toolOutputType = result.type || 'text';
+                  } else if (result.error) {
+                    toolOutputBuffer += `Error: ${result.error}`;
+                    toolOutputType = 'text';
+                  }
+                }
+
+                if (currentTool && toolOutputBuffer) {
+                  const toolContent = `[Tool: ${currentTool}]\n${toolOutputBuffer}`;
+                  sessionManager.addMessage(sessionId, {
+                    role: 'assistant',
+                    content: toolContent
+                  });
+                  currentTool = null;
+                  toolOutputBuffer = '';
+                  toolOutputType = undefined;
+                }
+              }
+              break;
+
+            case 'subagent':
+              if (parsed.name) {
+                currentSubagent = parsed.name;
+                this.sendEvent(sessionId, {
+                  type: 'status',
+                  data: `Subagent working: ${parsed.name}`,
+                  timestamp: Date.now()
+                });
+              }
+              break;
+
+            case 'error':
+              console.error('Claude error:', parsed.error);
+              this.sendEvent(sessionId, {
+                type: 'error',
+                data: parsed.error || 'Unknown error',
+                timestamp: Date.now()
+              });
+              break;
+
+            case 'finish':
+              sessionManager.updateSessionStatus(sessionId, 'done');
+              this.sendEvent(sessionId, {
+                type: 'status',
+                data: 'completed',
+                timestamp: Date.now()
+              });
+              break;
+
+            case 'system':
+              // System events - log if verbose, but don't send to frontend
+              if (parsed.msg) {
+                console.log('Claude system:', parsed.msg);
+              }
+              break;
           }
-          
-          if (displayText) {
-            sessionManager.appendToLastAssistantMessage(sessionId, displayText);
-            this.sendEvent(sessionId, {
-              type: 'output',
-              data: displayText,
-              timestamp: Date.now()
-            });
-          }
-        } catch (e) {
-          // Not JSON, send as raw output
-          if (line.trim()) {
-            sessionManager.appendToLastAssistantMessage(sessionId, line + '\n');
-            this.sendEvent(sessionId, {
-              type: 'output',
-              data: line + '\n',
-              timestamp: Date.now()
-            });
-          }
+        } catch (err) {
+          // Not JSON, might be partial - ignore
         }
       }
     });
 
     claudeProcess.stderr?.on('data', (data: Buffer) => {
-      const text = data.toString();
-      // Only send as error if it's actually an error
-      if (text.trim()) {
+      const text = data.toString().trim();
+      if (text) {
+        console.error('Claude stderr:', text);
+        // Also send errors to frontend
         this.sendEvent(sessionId, {
           type: 'error',
           data: text,
@@ -195,81 +244,44 @@ class ClaudeRunner extends EventEmitter {
     });
 
     claudeProcess.on('close', (code) => {
+      console.log(`Claude process exited with code ${code}`);
+      
+      // Handle abnormal exits
+      if (code !== 0) {
+        console.error(`Claude exited with code ${code}`);
+        sessionManager.updateSessionStatus(sessionId, 'error');
+        this.sendEvent(sessionId, {
+          type: 'error',
+          data: `Process exited with code ${code}`,
+          timestamp: Date.now()
+        });
+      }
+
       this.runningProcesses.delete(sessionId);
       sessionManager.clearSessionProcess(sessionId);
-
-      // Parse final output for result summary
-      let finalOutput = '';
-      const lines = outputBuffer.split('\n').filter(line => line.trim());
-      for (const line of lines) {
-        try {
-          const parsed = JSON.parse(line);
-          if (parsed.type === 'result' && parsed.result) {
-            finalOutput = parsed.result;
-          } else if (parsed.type === 'error' && parsed.error) {
-            finalOutput = `[Error: ${parsed.error}]`;
-          }
-        } catch (e) {
-          // Not JSON
-        }
-      }
-
-      // Check if we received any output - if not and code is 1, might be permission issue
-      if (code !== 0 && !finalOutput && !outputBuffer.trim()) {
-        sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code} (no output)`);
-        this.sendEvent(sessionId, {
-          type: 'error',
-          data: `Process exited with code ${code} (no output)`,
-          timestamp: Date.now()
-        });
-      } else if (code === 0) {
-        sessionManager.updateSessionStatus(sessionId, 'done');
-        this.sendEvent(sessionId, {
-          type: 'done',
-          data: finalOutput || 'Completed',
-          timestamp: Date.now()
-        });
-      } else {
-        sessionManager.updateSessionStatus(sessionId, 'error', `Exited with code ${code}`);
-        this.sendEvent(sessionId, {
-          type: 'error',
-          data: finalOutput || outputBuffer || `Process exited with code ${code}`,
-          timestamp: Date.now()
-        });
-      }
-
-      // Remove listeners AFTER sending done/error events
-      this.removeSessionListeners(sessionId);
     });
 
     claudeProcess.on('error', (err) => {
-      sessionManager.updateSessionStatus(sessionId, 'error', err.message);
+      console.error('Claude runner error:', err);
+      sessionManager.updateSessionStatus(sessionId, 'error');
       this.sendEvent(sessionId, {
         type: 'error',
-        data: err.message,
+        data: err.message || 'Failed to start Claude',
         timestamp: Date.now()
       });
-      this.removeSessionListeners(sessionId);
+      this.runningProcesses.delete(sessionId);
+      sessionManager.clearSessionProcess(sessionId);
     });
   }
 
-  stop(sessionId: string) {
+  stop(sessionId: string): void {
     const running = this.runningProcesses.get(sessionId);
     if (running) {
+      console.log(`Stopping process for session ${sessionId}`);
       running.process.kill('SIGTERM');
       this.runningProcesses.delete(sessionId);
       sessionManager.clearSessionProcess(sessionId);
-
-      this.sendEvent(sessionId, {
-        type: 'status',
-        data: 'Stopped by user',
-        timestamp: Date.now()
-      });
     }
-  }
-
-  isRunning(sessionId: string): boolean {
-    return this.runningProcesses.has(sessionId);
   }
 }
 

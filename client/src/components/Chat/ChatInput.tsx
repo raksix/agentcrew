@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: File[]) => void;
@@ -10,33 +10,108 @@ interface ChatInputProps {
   queuedCount?: number;
 }
 
+const SLASH_COMMANDS = [
+  { cmd: '/update-config', desc: 'Update Claude Code configuration' },
+  { cmd: '/debug', desc: 'Enable debug mode' },
+  { cmd: '/simplify', desc: 'Simplify the output' },
+  { cmd: '/batch', desc: 'Run in batch mode' },
+  { cmd: '/loop', desc: 'Enable loop mode' },
+  { cmd: '/claude-api', desc: 'Configure Claude API settings' },
+  { cmd: '/compact', desc: 'Compact context window' },
+  { cmd: '/context', desc: 'Show current context' },
+  { cmd: '/cost', desc: 'Show token usage and cost' },
+  { cmd: '/heapdump', desc: 'Generate heap dump' },
+  { cmd: '/pr-comments', desc: 'View PR comments' },
+  { cmd: '/release-notes', desc: 'Generate release notes' },
+  { cmd: '/review', desc: 'Review code changes' },
+  { cmd: '/security-review', desc: 'Run security review' },
+  { cmd: '/insights', desc: 'Show session insights' },
+];
+
 export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0 }: ChatInputProps) {
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [slashFilter, setSlashFilter] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const slashMenuRef = useRef<HTMLDivElement>(null);
+
+  const filteredCommands = SLASH_COMMANDS.filter(
+    c => c.cmd.toLowerCase().includes(slashFilter.toLowerCase()) ||
+         c.desc.toLowerCase().includes(slashFilter.toLowerCase())
+  );
 
   const handleSend = () => {
     if ((input.trim() || attachments.length > 0) && !disabled) {
       onSend(input.trim(), attachments);
       setInput('');
       setAttachments([]);
+      setShowSlashMenu(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (showSlashMenu && filteredCommands.length > 0) {
+        setInput(filteredCommands[0].cmd + ' ');
+        setShowSlashMenu(false);
+        setSlashFilter('');
+      } else {
+        handleSend();
+      }
+    } else if (e.key === 'Escape' && showSlashMenu) {
+      setShowSlashMenu(false);
+      setSlashFilter('');
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setInput(val);
+    
+    // Detect slash command
+    const cursorPos = e.target.selectionStart;
+    const textBeforeCursor = val.substring(0, cursorPos);
+    const lastSlashIndex = textBeforeCursor.lastIndexOf('/');
+    
+    if (lastSlashIndex !== -1 && lastSlashIndex === 0) {
+      const filterText = textBeforeCursor.substring(1);
+      if (!filterText.includes(' ')) {
+        setSlashFilter(filterText);
+        setShowSlashMenu(true);
+      } else {
+        setShowSlashMenu(false);
+      }
+    } else if (lastSlashIndex === -1) {
+      setShowSlashMenu(false);
+    }
+  };
+
+  const selectCommand = (cmd: string) => {
+    setInput(cmd + ' ');
+    setShowSlashMenu(false);
+    setSlashFilter('');
+    textareaRef.current?.focus();
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (slashMenuRef.current && !slashMenuRef.current.contains(e.target as Node)) {
+        setShowSlashMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       setAttachments(prev => [...prev, ...files]);
     }
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -84,17 +159,45 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
         )}
 
         {/* Main input container */}
-        <div className="bg-muted rounded-2xl border border-border px-4 py-3 focus-within:border-primary/50 transition-colors">
+        <div className="bg-muted rounded-2xl border border-border px-4 py-3 focus-within:border-primary/50 transition-colors relative">
           <textarea
             ref={textareaRef}
             className="w-full bg-transparent resize-none focus:outline-none text-foreground placeholder:text-muted-foreground text-sm"
-            placeholder={isRunning ? "Claude is working... your message will be queued..." : "Type your message..."}
+            placeholder={isRunning ? "Claude is working... your message will be queued..." : "Type your message or / for commands..."}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             disabled={disabled}
             rows={1}
           />
+          
+          {/* Slash command menu */}
+          {showSlashMenu && filteredCommands.length > 0 && (
+            <div 
+              ref={slashMenuRef}
+              className="absolute bottom-full left-4 right-4 mb-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-64 overflow-y-auto"
+            >
+              <div className="px-3 py-2 border-b border-border bg-muted/50">
+                <span className="text-xs text-muted-foreground font-medium">Commands</span>
+              </div>
+              {filteredCommands.map((cmd) => (
+                <button
+                  key={cmd.cmd}
+                  onClick={() => selectCommand(cmd.cmd)}
+                  className="w-full px-3 py-2 text-left hover:bg-muted transition-colors flex items-center justify-between gap-2"
+                >
+                  <div>
+                    <span className="text-sm font-mono text-primary">{cmd.cmd}</span>
+                    <span className="text-xs text-muted-foreground ml-2">{cmd.desc}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100">↵</span>
+                </button>
+              ))}
+              <div className="px-3 py-2 border-t border-border bg-muted/50 text-xs text-muted-foreground">
+                ↑↓ navigate • Enter select • Esc close
+              </div>
+            </div>
+          )}
           
           {/* Bottom row with actions */}
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
@@ -119,7 +222,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
               </button>
               
               <span className="text-xs text-muted-foreground hidden sm:inline">
-                Enter to send
+                Enter send • / for commands
               </span>
               
               {queuedCount > 0 && (
@@ -157,7 +260,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
         
         {/* Tips */}
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-3 text-xs text-muted-foreground">
-          <span>💡 Attach images & PDFs</span>
+          <span>💡 Attach images & PDFs • Type / for commands</span>
         </div>
       </div>
     </div>

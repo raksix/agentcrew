@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Session } from '@/lib/types';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
+import { Button } from '@heroui/react';
 
 interface ChatAreaProps {
   session: Session | null;
@@ -66,16 +67,16 @@ export function ChatArea({
         <div className="flex items-center gap-3">
           {/* Thinking toggle */}
           {thinkingContent && onToggleThinking && (
-            <button
-              onClick={onToggleThinking}
-              className={`text-xs px-3 py-1 rounded-full border transition-all ${
-                showThinking 
-                  ? 'bg-purple-100 border-purple-300 text-purple-700' 
-                  : 'bg-muted border-border text-muted-foreground hover:text-foreground'
-              }`}
+            <Button
+              size="sm"
+              variant={showThinking ? "solid" : "bordered"}
+              color="secondary"
+              onPress={onToggleThinking}
+              className="text-xs min-w-0 h-7 px-2"
+              startContent={<span className="text-xs">💭</span>}
             >
-              💭 Thinking {showThinking ? '▼' : '▶'}
-            </button>
+              {showThinking ? "Hide" : "Think"}
+            </Button>
           )}
           
           {queuedMessages > 0 && (
