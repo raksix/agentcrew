@@ -84,7 +84,8 @@ export default function Home() {
       try {
         console.log('Uploading', attachments.length, 'files');
         const uploaded = await api.uploadFiles(attachments);
-        attachmentUrls = uploaded.map(f => f.url);
+        const baseUrl = window.location.origin;
+        attachmentUrls = uploaded.map(f => `${baseUrl}${f.url}`);
         console.log('Upload successful:', attachmentUrls);
       } catch (e) {
         console.error('File upload failed:', e);

@@ -1,0 +1,29 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.minimax.io/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "sk-cp-tneCuTwMbeFrnrBniLHvhMqYtaVxt3ok9MoaOkVcnvH5viLXGb-jnjzS_2x7kfgYMigmOm4K5pYR8SyOwDiARXuDDnuaUFEAxpsWzM4ft55uAv_dkBVLH1c",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+    "ANTHROPIC_MODEL": "MiniMax-M2.7",
+    "ANTHROPIC_SMALL_FAST_MODEL": "MiniMax-M2.7",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "MiniMax-M2.7",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "MiniMax-M2.7",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M2.7",
+    "MINIMAX_API_KEY": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzQ1NTQzODI4LCJleHAiOjE3Nzc2ODc0Mjh9.RQ5f5g5VK2LQF4kx",
+    "MINIMAX_API_HOST": "https://api.minimax.io",
+    "MINIMAX_GROUP_ID": "1946088555856457976"
+  },
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:35729/mcp"
+    },
+    "minimax": {
+      "command": "uvx",
+      "args": ["minimax-coding-plan-mcp", "-y"],
+      "env": {
+        "MINIMAX_API_KEY": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzQ1NTQzODI4LCJleHAiOjE3Nzc2ODc0Mjh9.RQ5f5g5VK2LQF4kx",
+        "MINIMAX_API_HOST": "https://api.minimax.io"
+      }
+    }
+  }
+}
