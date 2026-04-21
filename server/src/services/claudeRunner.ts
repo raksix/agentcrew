@@ -53,6 +53,17 @@ class ClaudeRunner extends EventEmitter {
       }
     }
 
+    // Copy settings.json to session directory so MCP servers are available
+    const settingsSource = path.join(process.env.HOME || '/root', '.claude', 'settings.json');
+    const settingsDestDir = path.join(sessionWorkDir, '.claude');
+    const settingsDest = path.join(settingsDestDir, 'settings.json');
+    if (fs.existsSync(settingsSource) && !fs.existsSync(settingsDest)) {
+      if (!fs.existsSync(settingsDestDir)) {
+        fs.mkdirSync(settingsDestDir, { recursive: true });
+      }
+      fs.copyFileSync(settingsSource, settingsDest);
+    }
+
     const cwd = sessionWorkDir;
 
     this.sendEvent(sessionId, {

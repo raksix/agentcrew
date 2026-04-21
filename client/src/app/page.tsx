@@ -82,10 +82,13 @@ export default function Home() {
     let attachmentUrls: string[] = [];
     if (attachments && attachments.length > 0) {
       try {
+        console.log('Uploading', attachments.length, 'files');
         const uploaded = await api.uploadFiles(attachments);
         attachmentUrls = uploaded.map(f => f.url);
+        console.log('Upload successful:', attachmentUrls);
       } catch (e) {
         console.error('File upload failed:', e);
+        alert('File upload failed: ' + e);
         return;
       }
     }
@@ -98,10 +101,15 @@ export default function Home() {
     
     setStreamingOutput('');
     try { 
+      console.log('Sending message:', fullContent.substring(0, 100));
       const result = await api.sendMessage(activeSession.id, fullContent);
+      console.log('Message sent successfully');
       setActiveSession({ ...result.session });
       setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error('Send message failed:', e); 
+      alert('Send failed: ' + e);
+    }
   };
 
   const handleStop = async () => {

@@ -12,7 +12,7 @@ interface ChatAreaProps {
   thinkingContent?: string;
   showThinking?: boolean;
   onToggleThinking?: () => void;
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, attachments?: File[]) => void;
   onStop: () => void;
   queuedMessages?: number;
   isConnected?: boolean;

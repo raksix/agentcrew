@@ -43,7 +43,9 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
   );
 
   const handleSend = () => {
+    console.log('handleSend called, input:', input.substring(0, 50), 'attachments:', attachments.length, 'disabled:', disabled);
     if ((input.trim() || attachments.length > 0) && !disabled) {
+      console.log('handleSend proceeding to call onSend');
       onSend(input.trim(), attachments);
       setInput('');
       setAttachments([]);
@@ -109,6 +111,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    console.log('Files selected:', files.length, files.map(f => f.name));
     if (files.length > 0) {
       setAttachments(prev => [...prev, ...files]);
     }
@@ -245,7 +248,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
               ) : (
                 <button
                   onClick={handleSend}
-                  disabled={disabled || (!input.trim() && attachments.length === 0)}
+                  disabled={disabled || (!input.trim() && attachments.length === 0) || isRunning}
                   className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
