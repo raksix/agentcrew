@@ -104,3 +104,62 @@
 2026-04-18T10:20:15:   code: 'E2BIG',
 2026-04-18T10:20:15:   syscall: 'spawn'
 2026-04-18T10:20:15: }
+2026-04-18T13:45:25: Claude exited with code 1
+2026-04-18T13:45:34: Claude exited with code 1
+2026-04-18T13:49:38: Claude exited with code 1
+2026-04-18T13:50:54: Claude exited with code 1
+2026-04-21T10:17:46: Claude runner error for queued message: RangeError: Maximum call stack size exceeded
+2026-04-21T10:17:46:     at sendEvent (/root/.openclaw/workspace/agentcrew/server/src/index.ts:210:21)
+2026-04-21T10:17:46:     at <anonymous> (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:25:29)
+2026-04-21T10:17:46:     at Array.forEach (<anonymous>)
+2026-04-21T10:17:46:     at ClaudeRunner.sendEvent (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:25:15)
+2026-04-21T10:17:46:     at sendEvent (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:310:12)
+2026-04-21T10:17:46:     at <anonymous> (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:25:29)
+2026-04-21T10:17:46:     at Array.forEach (<anonymous>)
+2026-04-21T10:17:46:     at ClaudeRunner.sendEvent (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:25:15)
+2026-04-21T10:17:46:     at sendEvent (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:310:12)
+2026-04-21T10:17:46:     at <anonymous> (/root/.openclaw/workspace/agentcrew/server/src/services/claudeRunner.ts:25:29)
+2026-04-21T10:20:36: MulterError: Unexpected field
+2026-04-21T10:20:36:     at wrappedFileFilter (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/index.js:41:19)
+2026-04-21T10:20:36:     at Multipart.<anonymous> (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/lib/make-middleware.js:183:7)
+2026-04-21T10:20:36:     at Multipart.emit (node:events:519:28)
+2026-04-21T10:20:36:     at HeaderParser.cb (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:358:14)
+2026-04-21T10:20:36:     at HeaderParser.push (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:162:20)
+2026-04-21T10:20:36:     at SBMH.ssCb [as _cb] (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:394:37)
+2026-04-21T10:20:36:     at feed (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:219:14)
+2026-04-21T10:20:36:     at SBMH.push (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:104:16)
+2026-04-21T10:20:36:     at Multipart._write (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:567:19)
+2026-04-21T10:20:36:     at writeOrBuffer (node:internal/streams/writable:572:12)
+2026-04-21T10:21:46: Error: Only images and PDFs are allowed
+2026-04-21T10:21:46:     at fileFilter (/root/.openclaw/workspace/agentcrew/server/src/index.ts:39:10)
+2026-04-21T10:21:46:     at wrappedFileFilter (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/index.js:45:7)
+2026-04-21T10:21:46:     at Multipart.<anonymous> (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/lib/make-middleware.js:183:7)
+2026-04-21T10:21:46:     at Multipart.emit (node:events:519:28)
+2026-04-21T10:21:46:     at HeaderParser.cb (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:358:14)
+2026-04-21T10:21:46:     at HeaderParser.push (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:162:20)
+2026-04-21T10:21:46:     at SBMH.ssCb [as _cb] (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:394:37)
+2026-04-21T10:21:46:     at feed (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:219:14)
+2026-04-21T10:21:46:     at SBMH.push (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:104:16)
+2026-04-21T10:21:46:     at Multipart._write (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:567:19)
+2026-04-21T10:21:55: Error: Only images and PDFs are allowed
+2026-04-21T10:21:55:     at fileFilter (/root/.openclaw/workspace/agentcrew/server/src/index.ts:39:10)
+2026-04-21T10:21:55:     at wrappedFileFilter (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/index.js:45:7)
+2026-04-21T10:21:55:     at Multipart.<anonymous> (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/lib/make-middleware.js:183:7)
+2026-04-21T10:21:55:     at Multipart.emit (node:events:519:28)
+2026-04-21T10:21:55:     at HeaderParser.cb (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:358:14)
+2026-04-21T10:21:55:     at HeaderParser.push (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:162:20)
+2026-04-21T10:21:55:     at SBMH.ssCb [as _cb] (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:394:37)
+2026-04-21T10:21:55:     at feed (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:219:14)
+2026-04-21T10:21:55:     at SBMH.push (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:104:16)
+2026-04-21T10:21:55:     at Multipart._write (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:567:19)
+2026-04-21T10:22:08: Error: Only images and PDFs are allowed
+2026-04-21T10:22:08:     at fileFilter (/root/.openclaw/workspace/agentcrew/server/src/index.ts:39:10)
+2026-04-21T10:22:08:     at wrappedFileFilter (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/index.js:45:7)
+2026-04-21T10:22:08:     at Multipart.<anonymous> (/root/.openclaw/workspace/agentcrew/server/node_modules/multer/lib/make-middleware.js:183:7)
+2026-04-21T10:22:08:     at Multipart.emit (node:events:519:28)
+2026-04-21T10:22:08:     at HeaderParser.cb (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:358:14)
+2026-04-21T10:22:08:     at HeaderParser.push (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:162:20)
+2026-04-21T10:22:08:     at SBMH.ssCb [as _cb] (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:394:37)
+2026-04-21T10:22:08:     at feed (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:219:14)
+2026-04-21T10:22:08:     at SBMH.push (/root/.openclaw/workspace/agentcrew/server/node_modules/streamsearch/lib/sbmh.js:104:16)
+2026-04-21T10:22:08:     at Multipart._write (/root/.openclaw/workspace/agentcrew/server/node_modules/busboy/lib/types/multipart.js:567:19)
