@@ -10,8 +10,8 @@ interface RunningProcess {
   sessionId: string;
 }
 
-// Base directory for session working directories
-const SESSIONS_BASE_DIR = path.join(process.cwd(), 'sessions');
+// Base directory for session working directories (absolute path for PM2 compatibility)
+const SESSIONS_BASE_DIR = '/root/.openclaw/workspace/agentcrew/server/sessions';
 
 // Maximum command line argument size (1MB to be safe on Linux)
 const MAX_ARG_SIZE = 1000 * 1024;
@@ -65,8 +65,11 @@ class ClaudeRunner extends EventEmitter {
     // This avoids E2BIG errors with long conversation histories
     const fullTask = task;
 
-    // Detect if running as root - bypass permission check for root
+    // Set CLAUDE_HOME to session-specific directory for memory isolation
     const env = { ...process.env };
+    env.CLAUDE_HOME = sessionWorkDir;
+    
+    // Detect if running as root - bypass permission check for root
     if (process.getuid && process.getuid() === 0) {
       env.CLAUDE_NO_CHECK = '1';
     }
@@ -152,6 +155,9 @@ class ClaudeRunner extends EventEmitter {
                   data: 'completed',
                   timestamp: Date.now()
                 });
+                
+                // Process next message from queue
+                this.processNextInQueue(sessionId);
               }
               break;
 
@@ -255,6 +261,9 @@ class ClaudeRunner extends EventEmitter {
           data: `Process exited with code ${code}`,
           timestamp: Date.now()
         });
+        
+        // Still try to process queue even on error
+        this.processNextInQueue(sessionId);
       }
 
       this.runningProcesses.delete(sessionId);
@@ -282,6 +291,33 @@ class ClaudeRunner extends EventEmitter {
       this.runningProcesses.delete(sessionId);
       sessionManager.clearSessionProcess(sessionId);
     }
+  }
+
+  private processNextInQueue(sessionId: string): void {
+    const nextMessage = sessionManager.popFromQueue(sessionId);
+    if (!nextMessage) return;
+
+    console.log(`Processing queued message for session ${sessionId}`);
+    
+    // Add user message
+    sessionManager.addMessage(sessionId, {
+      role: 'user',
+      content: nextMessage
+    });
+
+    // Setup WebSocket broadcast for this session
+    const sendEvent = (event: SessionEvent) => {
+      this.sendEvent(sessionId, event);
+    };
+    this.onSessionEvent(sessionId, sendEvent);
+
+    // Run Claude Code with the queued message
+    const session = sessionManager.getSession(sessionId);
+    const workdir = session?.workdir;
+    
+    this.run(sessionId, nextMessage, workdir).catch(err => {
+      console.error('Claude runner error for queued message:', err);
+    });
   }
 }
 

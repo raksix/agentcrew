@@ -43,7 +43,7 @@ function MessageBubble({ message }: { message: Message }) {
                       style={oneDark}
                       language={match[1]}
                       PreTag="div"
-                      className="rounded-lg mt-2 mb-2 text-sm !bg-[oklch(0.12_0_0)] overflow-x-auto"
+                      className="rounded-lg mt-2 mb-2 text-sm !bg-[oklch(0.12_0_0)] overflow-x-auto max-w-full"
                       {...props}
                     >
                       {code}

@@ -186,6 +186,16 @@ app.post('/api/sessions/:id/message', async (req, res) => {
     return res.status(404).json({ error: 'Session not found' });
   }
 
+  // Check if session is busy - if so, add to queue
+  if (session.status === 'running' || session.status === 'writing') {
+    const updatedSession = sessionManager.addToQueue(req.params.id, data.content);
+    return res.json({ 
+      queued: true,
+      queueSize: updatedSession ? updatedSession.queue.length : 1,
+      session: updatedSession
+    });
+  }
+
   // Add user message
   const message = sessionManager.addMessage(req.params.id, {
     role: 'user',
@@ -211,6 +221,7 @@ app.post('/api/sessions/:id/message', async (req, res) => {
   });
 
   res.json({ 
+    queued: false,
     message,
     session: sessionManager.getSession(req.params.id)
   });

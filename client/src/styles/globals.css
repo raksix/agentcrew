@@ -81,6 +81,10 @@
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+    overscroll-behavior: none;
   }
   
   body {

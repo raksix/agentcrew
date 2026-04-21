@@ -37,18 +37,33 @@ export function getSession(id: string): Session | undefined {
 export function createSession(data: CreateSessionRequest): Session {
   const sessions = loadSessions();
   
+  const sessionId = uuidv4();
   const newSession: Session = {
-    id: uuidv4(),
+    id: sessionId,
     name: data.name || `Session ${sessions.length + 1}`,
     projectTag: data.projectTag,
     status: 'idle',
-    workdir: data.workdir || process.cwd(),
+    workdir: data.workdir && typeof data.workdir === 'string' 
+      ? data.workdir 
+      : '/root/.openclaw/workspace/agentcrew/server/sessions/' + sessionId,
     createdAt: Date.now(),
     updatedAt: Date.now(),
     messages: [],
-    subagents: []
+    subagents: [],
+    queue: []
   };
   
+  // Create session working directory for resume support
+  const sessionsBaseDir = '/root/.openclaw/workspace/agentcrew/server/sessions';
+  if (!fs.existsSync(sessionsBaseDir)) {
+    fs.mkdirSync(sessionsBaseDir, { recursive: true });
+  }
+  if (newSession.workdir) {
+    if (!fs.existsSync(newSession.workdir)) {
+      fs.mkdirSync(newSession.workdir, { recursive: true });
+    }
+  }
+
   sessions.push(newSession);
   saveSessions(sessions);
   
@@ -217,4 +232,39 @@ export function updateSubagent(sessionId: string, subagentId: string, data: Part
   
   saveSessions(sessions);
   return true;
+}
+
+export function addToQueue(sessionId: string, message: string): Session | null {
+  const sessions = loadSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  
+  if (!session) return null;
+  
+  if (!session.queue) session.queue = [];
+  session.queue.push(message);
+  session.updatedAt = Date.now();
+  
+  saveSessions(sessions);
+  return session;
+}
+
+export function popFromQueue(sessionId: string): string | null {
+  const sessions = loadSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  
+  if (!session || !session.queue || session.queue.length === 0) return null;
+  
+  const message = session.queue.shift()!;
+  session.updatedAt = Date.now();
+  
+  saveSessions(sessions);
+  return message;
+}
+
+export function getQueueSize(sessionId: string): number {
+  const sessions = loadSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  
+  if (!session || !session.queue) return 0;
+  return session.queue.length;
 }

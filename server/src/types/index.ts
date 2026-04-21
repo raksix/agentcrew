@@ -26,6 +26,7 @@ export interface Session {
   updatedAt: number;
   messages: Message[];
   subagents: Subagent[];
+  queue: string[];
   processId?: number;
   lastError?: string;
 }

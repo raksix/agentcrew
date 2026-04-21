@@ -162,7 +162,7 @@ export function ChatInput({ onSend, onStop, disabled, isRunning, queuedCount = 0
         <div className="bg-muted rounded-2xl border border-border px-4 py-3 focus-within:border-primary/50 transition-colors relative">
           <textarea
             ref={textareaRef}
-            className="w-full bg-transparent resize-none focus:outline-none text-foreground placeholder:text-muted-foreground text-sm"
+            className="w-full bg-transparent resize-none focus:outline-none text-foreground placeholder:text-muted-foreground text-base"
             placeholder={isRunning ? "Claude is working... your message will be queued..." : "Type your message or / for commands..."}
             value={input}
             onChange={handleInputChange}

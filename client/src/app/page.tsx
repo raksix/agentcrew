@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { ChatArea } from '@/components/Chat';
 
@@ -16,33 +16,8 @@ export default function Home() {
   const [thinkingContent, setThinkingContent] = useState('');
   const [showThinking, setShowThinking] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [messageQueue, setMessageQueue] = useState<string[]>([]);
   
-  const messageQueueRef = useRef<string[]>([]);
-  
-  useEffect(() => {
-    messageQueueRef.current = messageQueue;
-  }, [messageQueue]);
-
   useEffect(() => { loadSessions(); }, []);
-
-  const processQueue = useCallback(async () => {
-    const queue = messageQueueRef.current;
-    if (queue.length === 0 || !activeSession) return;
-    
-    const [nextMessage, ...rest] = queue;
-    setMessageQueue(rest);
-    messageQueueRef.current = rest;
-    
-    setStreamingOutput('');
-    try { 
-      const result = await api.sendMessage(activeSession.id, nextMessage);
-      setActiveSession({ ...result.session });
-      setRefreshKey(k => k + 1);
-      setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
-    } catch (e) { console.error(e); }
-  }, [activeSession]);
 
   const { isConnected, lastMessage } = useWebSocket(activeSession?.id || null);
   
@@ -69,11 +44,10 @@ export default function Home() {
           setActiveSession(updated);
           setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
           setStreamingOutput('');
-          processQueue();
         }).catch(console.error);
       }, 1000);
     }
-  }, [lastMessage, activeSession, processQueue]);
+  }, [lastMessage, activeSession]);
 
   const loadSessions = async () => {
     try { 
@@ -122,16 +96,10 @@ export default function Home() {
       fullContent = content + '\n\n**Attachments:**\n' + attachmentUrls.map(url => `- [${url.split('/').pop()}](${url})`).join('\n');
     }
     
-    if (activeSession.status === 'running') {
-      setMessageQueue(prev => [...prev, fullContent]);
-      return;
-    }
-    
     setStreamingOutput('');
     try { 
       const result = await api.sendMessage(activeSession.id, fullContent);
       setActiveSession({ ...result.session });
-      setRefreshKey(k => k + 1);
       setSessions(prev => prev.map(s => s.id === result.session.id ? { ...result.session } : s));
     } catch (e) { console.error(e); }
   };
@@ -141,18 +109,16 @@ export default function Home() {
     try { 
       await api.stopSession(activeSession.id); 
       setStreamingOutput(prev => prev + '\n[Stopped]');
-      setMessageQueue([]);
     } catch (e) { console.error(e); }
   };
 
   const handleSelectSession = (session: Session) => {
     setActiveSession(session);
     setSidebarOpen(false);
-    setMessageQueue([]);
   };
 
   return (
-    <div className="flex h-screen bg-transparent">
+    <div className="flex h-screen bg-transparent overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -199,7 +165,6 @@ export default function Home() {
         </div>
         
         <ChatArea 
-          key={refreshKey}
           session={activeSession} 
           streamingOutput={streamingOutput} 
           thinkingContent={thinkingContent}
@@ -207,7 +172,7 @@ export default function Home() {
           onToggleThinking={() => setShowThinking(!showThinking)}
           onSendMessage={handleSendMessage} 
           onStop={handleStop}
-          queuedMessages={messageQueue.length}
+          queuedMessages={activeSession?.queue?.length || 0}
           isConnected={isConnected}
         />
         
